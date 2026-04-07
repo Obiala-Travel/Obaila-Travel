@@ -101,10 +101,34 @@ function swapAirports() {
 }
 
 // ── Search ────────────────────────────────────────────
+const searchError = ref('');
+
+function tryAutoMatch(query: string, setter: (ap: typeof AIRPORTS[0]) => void): boolean {
+    if (!query) return false;
+    const q = query.trim().toLowerCase();
+    // Exact IATA code match
+    const exact = AIRPORTS.find(a => a.code.toLowerCase() === q);
+    if (exact) { setter(exact); return true; }
+    // Unique city match
+    const cityMatches = AIRPORTS.filter(a => a.city.toLowerCase().includes(q));
+    if (cityMatches.length === 1) { setter(cityMatches[0]); return true; }
+    return false;
+}
+
 function searchFlights() {
-    if (!origin.value || !destination.value || !departDate.value) return;
+    searchError.value = '';
+
+    // Auto-match if user typed but didn't click a dropdown suggestion
+    if (!origin.value) tryAutoMatch(originQuery.value, pickOrigin);
+    if (!destination.value) tryAutoMatch(destQuery.value, pickDest);
+
+    if (!origin.value) { searchError.value = 'Please select a departure airport from the list.'; return; }
+    if (!destination.value) { searchError.value = 'Please select a destination airport from the list.'; return; }
+    if (!departDate.value) { searchError.value = 'Please pick a departure date.'; return; }
+
     router.get('/flights/search', {
-        origin, destination,
+        origin:      origin.value,
+        destination: destination.value,
         depart:      departDate.value,
         return_date: tripType.value === 'round-trip' ? returnDate.value : undefined,
         adults:      adults.value,
@@ -369,6 +393,11 @@ const POPULAR_ROUTES = [
                             <Search class="h-4 w-4" /> Search Flights
                         </button>
                     </div>
+
+                    <!-- Inline search error -->
+                    <p v-if="searchError" class="mt-2 text-sm font-medium text-red-600">
+                        ⚠ {{ searchError }}
+                    </p>
 
                     <!-- Nearby airports -->
                     <div class="mt-3 flex items-center gap-2">
