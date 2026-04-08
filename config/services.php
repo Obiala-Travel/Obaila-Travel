@@ -41,4 +41,9 @@ return [
         'api_version' => env('DUFFEL_API_VERSION', 'v2'),
     ],
 
+    'stripe' => [
+        'key'    => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
 ];

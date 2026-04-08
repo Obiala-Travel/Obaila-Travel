@@ -22,6 +22,7 @@ Route::get('/hotels/search', [HotelController::class, 'search'])->name('hotels.s
 Route::post('/checkout/flight/select', [CheckoutController::class, 'selectFlight'])->name('checkout.flight.select');
 Route::get('/checkout/flight', [CheckoutController::class, 'showFlight'])->name('checkout.flight');
 Route::post('/checkout/flight', [CheckoutController::class, 'storeFlight'])->name('checkout.flight.store');
+Route::get('/checkout/flight/complete', [CheckoutController::class, 'completeFlight'])->name('checkout.flight.complete');
 Route::get('/booking/{reference}', [CheckoutController::class, 'confirmation'])->name('booking.confirmation');
 
 // Authenticated routes

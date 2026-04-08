@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Stripe\Exception\ApiErrorException;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
@@ -46,15 +50,15 @@ class CheckoutController extends Controller
     }
 
     // ──────────────────────────────────────────────────────────────
-    //  STEP 3 — Process booking (validate + save)
+    //  STEP 3 — Validate passengers, create Booking + PaymentIntent
     // ──────────────────────────────────────────────────────────────
 
-    public function storeFlight(Request $request): RedirectResponse
+    public function storeFlight(Request $request): JsonResponse
     {
         $offer = session('pending_flight_offer');
 
         if (empty($offer)) {
-            return redirect('/')->with('error', 'Session expired. Please search again.');
+            return response()->json(['error' => 'Session expired. Please search again.'], 422);
         }
 
         $validated = $request->validate([
@@ -73,19 +77,22 @@ class CheckoutController extends Controller
         ]);
 
         $reference = 'OB-' . strtoupper(Str::random(6));
+        $price     = (float) ($offer['price'] ?? 0);
+        $currency  = strtolower($offer['currency'] ?? 'usd');
 
+        // Create the booking (status: pending until payment confirmed)
         $booking = Booking::create([
-            'user_id'     => auth()->id(), // null for guests
-            'type'        => 'flight',
-            'reference'   => $reference,
-            'origin'      => $offer['origin']      ?? null,
-            'destination' => $offer['destination'] ?? null,
-            'depart_at'   => $offer['departs_at']  ?? null,
-            'passengers'  => count($validated['passengers']),
-            'cabin_class' => $offer['cabin_class'] ?? null,
-            'total_price' => $offer['price']       ?? 0,
-            'currency'    => $offer['currency']    ?? 'USD',
-            'status'      => 'pending',
+            'user_id'      => auth()->id(),
+            'type'         => 'flight',
+            'reference'    => $reference,
+            'origin'       => $offer['origin']      ?? null,
+            'destination'  => $offer['destination'] ?? null,
+            'depart_at'    => $offer['departs_at']  ?? null,
+            'passengers'   => count($validated['passengers']),
+            'cabin_class'  => $offer['cabin_class'] ?? null,
+            'total_price'  => $price,
+            'currency'     => strtoupper($currency),
+            'status'       => 'pending',
             'raw_response' => [
                 'offer'      => $offer,
                 'passengers' => $validated['passengers'],
@@ -96,14 +103,76 @@ class CheckoutController extends Controller
             ],
         ]);
 
-        // Clear session so they can't double-submit
+        // Create Stripe PaymentIntent
+        try {
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            $intent = PaymentIntent::create([
+                'amount'   => (int) round($price * 100), // Stripe uses cents
+                'currency' => $currency,
+                'metadata' => [
+                    'booking_reference' => $reference,
+                    'booking_id'        => $booking->id,
+                    'origin'            => $offer['origin']      ?? '',
+                    'destination'       => $offer['destination'] ?? '',
+                ],
+                'receipt_email'             => $validated['contact_email'],
+                'automatic_payment_methods' => ['enabled' => true],
+            ]);
+
+            return response()->json([
+                'client_secret' => $intent->client_secret,
+                'reference'     => $reference,
+            ]);
+        } catch (ApiErrorException $e) {
+            // Roll back the booking if Stripe fails
+            $booking->delete();
+
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    //  STEP 4 — Payment complete (Stripe redirects here)
+    //           Verify the PaymentIntent and confirm the booking
+    // ──────────────────────────────────────────────────────────────
+
+    public function completeFlight(Request $request): Response|RedirectResponse
+    {
+        $reference        = $request->query('reference');
+        $paymentIntentId  = $request->query('payment_intent');
+
+        $booking = Booking::where('reference', $reference)->first();
+
+        if (! $booking) {
+            return redirect('/')->with('error', 'Booking not found.');
+        }
+
+        // Verify payment with Stripe
+        if ($paymentIntentId && config('services.stripe.secret')) {
+            try {
+                Stripe::setApiKey(config('services.stripe.secret'));
+                $intent = PaymentIntent::retrieve($paymentIntentId);
+
+                if ($intent->status === 'succeeded') {
+                    $booking->update([
+                        'status'              => 'confirmed',
+                        'provider_booking_id' => $paymentIntentId,
+                    ]);
+                }
+            } catch (ApiErrorException $e) {
+                // Leave status as pending — booking still exists
+            }
+        }
+
+        // Clear session
         session()->forget('pending_flight_offer');
 
         return redirect()->route('booking.confirmation', ['reference' => $reference]);
     }
 
     // ──────────────────────────────────────────────────────────────
-    //  STEP 4 — Confirmation page
+    //  STEP 5 — Confirmation page
     // ──────────────────────────────────────────────────────────────
 
     public function confirmation(string $reference): Response|RedirectResponse
@@ -123,7 +192,7 @@ class CheckoutController extends Controller
                 'depart_at'   => $booking->depart_at,
                 'passengers'  => $booking->passengers,
                 'cabin_class' => $booking->cabin_class,
-                'total_price' => $booking->total_price,
+                'total_price' => (float) $booking->total_price,
                 'currency'    => $booking->currency,
                 'status'      => $booking->status,
                 'offer'       => $booking->raw_response['offer']      ?? [],
