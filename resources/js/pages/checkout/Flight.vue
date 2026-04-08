@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
-import { Lock, AlertCircle, PlaneTakeoff } from 'lucide-vue-next';
+import { Lock, AlertCircle } from 'lucide-vue-next';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
 defineOptions({ layout: GuestLayout });
@@ -109,43 +110,27 @@ async function proceedToPayment() {
     processing.value = true;
 
     try {
-        const csrf = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? '';
-
-        const res = await fetch('/checkout/flight', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({
-                contact_email: form.contact_email,
-                contact_phone: form.contact_phone,
-                passengers:    form.passengers,
-            }),
+        // axios is pre-configured with X-XSRF-TOKEN cookie — no manual CSRF handling needed
+        const { data } = await axios.post('/checkout/flight', {
+            contact_email: form.contact_email,
+            contact_phone: form.contact_phone,
+            passengers:    form.passengers,
         });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            // Laravel validation errors come back as { errors: { field: ['msg'] } }
-            if (data.errors) {
-                Object.keys(data.errors).forEach(key => {
-                    (form.errors as any)[key] = data.errors[key][0];
-                });
-            }
-            generalError.value = data.message || 'Please fix the errors above.';
-            processing.value = false;
-            return;
-        }
 
         // Mount Stripe Payment Element with the client_secret
         await mountStripe(data.client_secret, data.reference);
         step.value = 'payment';
 
-    } catch (e) {
-        generalError.value = 'Something went wrong. Please try again.';
+    } catch (e: any) {
+        // Laravel validation errors: { errors: { field: ['msg'] } }
+        if (e.response?.data?.errors) {
+            Object.keys(e.response.data.errors).forEach(key => {
+                (form.errors as any)[key] = e.response.data.errors[key][0];
+            });
+            generalError.value = 'Please fix the errors above.';
+        } else {
+            generalError.value = e.response?.data?.message || 'Something went wrong. Please try again.';
+        }
     } finally {
         processing.value = false;
     }
