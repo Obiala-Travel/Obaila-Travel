@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import axios from 'axios';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
 import { Lock, AlertCircle } from 'lucide-vue-next';
@@ -117,9 +117,10 @@ async function proceedToPayment() {
             passengers:    form.passengers,
         });
 
-        // Mount Stripe Payment Element with the client_secret
-        await mountStripe(data.client_secret, data.reference);
+        // Show payment step first so paymentEl div is rendered in the DOM,
+        // then mount Stripe into it via nextTick inside mountStripe()
         step.value = 'payment';
+        await mountStripe(data.client_secret, data.reference);
 
     } catch (e: any) {
         // Laravel validation errors: { errors: { field: ['msg'] } }
@@ -160,8 +161,8 @@ async function mountStripe(clientSecret: string, reference: string) {
 
     const el = elements.value.create('payment', { layout: 'tabs' });
 
-    // Wait for DOM to update, then mount
-    await new Promise(r => setTimeout(r, 50));
+    // Wait for Vue to flush the DOM update (step = 'payment' renders paymentEl)
+    await nextTick();
     if (paymentEl.value) el.mount(paymentEl.value);
 
     stripeReady.value = true;
