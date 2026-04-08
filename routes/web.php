@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\HotelController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,12 @@ Route::get('/flights/search', [FlightController::class, 'search'])->name('flight
 
 // Hotel search (public)
 Route::get('/hotels/search', [HotelController::class, 'search'])->name('hotels.search');
+
+// Checkout (public — guest checkout allowed)
+Route::post('/checkout/flight/select', [CheckoutController::class, 'selectFlight'])->name('checkout.flight.select');
+Route::get('/checkout/flight', [CheckoutController::class, 'showFlight'])->name('checkout.flight');
+Route::post('/checkout/flight', [CheckoutController::class, 'storeFlight'])->name('checkout.flight.store');
+Route::get('/booking/{reference}', [CheckoutController::class, 'confirmation'])->name('booking.confirmation');
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {

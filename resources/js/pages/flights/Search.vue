@@ -179,7 +179,7 @@ function setPriceAlert() {
 
 // ── Book ───────────────────────────────────────────────────────────────────
 function bookFlight(offer: Offer) {
-    router.visit('/checkout/flight', { method: 'get', data: { offer_id: offer.id } });
+    router.post('/checkout/flight/select', { offer });
 }
 
 // ── Modify search ──────────────────────────────────────────────────────────
