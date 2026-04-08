@@ -177,17 +177,23 @@ async function confirmPayment() {
     processing.value = true;
     stripeError.value = '';
 
-    const reference = sessionStorage.getItem('pending_reference') ?? '';
-    const returnUrl = `${window.location.origin}/checkout/flight/complete?reference=${reference}`;
+    try {
+        const reference = sessionStorage.getItem('pending_reference') ?? '';
+        const returnUrl = `${window.location.origin}/checkout/flight/complete?reference=${reference}`;
 
-    const { error } = await stripe.value.confirmPayment({
-        elements: elements.value,
-        confirmParams: { return_url: returnUrl },
-    });
+        const { error } = await stripe.value.confirmPayment({
+            elements: elements.value,
+            confirmParams: { return_url: returnUrl },
+        });
 
-    // If we get here, confirmPayment redirected or failed
-    if (error) {
-        stripeError.value = error.message ?? 'Payment failed. Please try again.';
+        // Only reached if Stripe did NOT redirect (i.e. there was a payment error)
+        if (error) {
+            stripeError.value = error.message ?? 'Payment failed. Please try again.';
+        }
+    } catch (e: any) {
+        stripeError.value = e?.message ?? 'An unexpected error occurred. Please try again.';
+    } finally {
+        // Always re-enable the button so the user can retry
         processing.value = false;
     }
 }
