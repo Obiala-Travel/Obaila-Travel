@@ -249,6 +249,90 @@ class DuffelService
     }
 
     // ──────────────────────────────────────────────────────────────
+    //  MOCK HOTELS
+    // ──────────────────────────────────────────────────────────────
+
+    public function mockHotels(array $params): array
+    {
+        $names = [
+            'Grand Palace', 'The Riverside', 'Skyline Suites', 'Royal Garden',
+            'Urban Oasis', 'Boutique Centrale', 'The Meridian', 'Harbour View',
+            'Sunset Boulevard', 'The Pinnacle', 'Azure Heights', 'Clifton House',
+            'The Carlton', 'Bloom Hotel', 'Anchor & Bay',
+        ];
+
+        $types     = ['hotel', 'hotel', 'hotel', 'apartment', 'villa', 'resort', 'bnb', 'hostel'];
+        $amenities = ['🛁 Pool', '📶 Free WiFi', '🅿️ Parking', '🍳 Breakfast', '💪 Gym', '🧖 Spa', '☕ Café', '🌿 Garden', '🚐 Shuttle'];
+        $emojis    = ['🏨', '🏩', '🏰', '🏯', '🌴', '🌅', '🗼', '🌃', '🏔️', '🛳️'];
+        $currency  = $params['currency'] ?? 'USD';
+
+        $checkin  = $params['checkin']  ?? now()->addDays(7)->toDateString();
+        $checkout = $params['checkout'] ?? now()->addDays(10)->toDateString();
+        $nights   = max(1, (int) ceil((strtotime($checkout) - strtotime($checkin)) / 86400));
+        $guests   = (int) ($params['guests'] ?? 1);
+        $minStars = (int) ($params['stars'] ?? 0);
+
+        $count  = rand(8, 14);
+        $hotels = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $stars  = max($minStars, rand(2, 5));
+            $base   = match ($stars) {
+                5 => rand(200, 400),
+                4 => rand(100, 200),
+                3 => rand(55, 110),
+                default => rand(25, 60),
+            };
+            $pricePerNight = (int) round($base / 5) * 5;
+            $rating        = round(rand(75, 99) / 10, 1);
+            $ratingLabel   = match (true) {
+                $rating >= 9.0 => 'Exceptional',
+                $rating >= 8.0 => 'Excellent',
+                $rating >= 7.0 => 'Very Good',
+                default        => 'Good',
+            };
+
+            shuffle($amenities);
+            $hotelAmenities = array_slice($amenities, 0, rand(3, 6));
+
+            $hotels[] = [
+                'id'             => 'hotel_' . uniqid(),
+                'name'           => $names[$i % count($names)] . ($i >= count($names) ? ' ' . ($i + 1) : ''),
+                'destination'    => $params['destination'] ?? 'London',
+                'type'           => $types[$i % count($types)],
+                'stars'          => $stars,
+                'rating'         => $rating,
+                'rating_label'   => $ratingLabel,
+                'price_per_night'=> $pricePerNight,
+                'total_price'    => $pricePerNight * $nights,
+                'currency'       => $currency,
+                'nights'         => $nights,
+                'guests'         => $guests,
+                'amenities'      => $hotelAmenities,
+                'free_cancel'    => (bool) rand(0, 1),
+                'emoji'          => $emojis[$i % count($emojis)],
+                'checkin'        => $checkin,
+                'checkout'       => $checkout,
+            ];
+        }
+
+        usort($hotels, fn ($a, $b) => $a['price_per_night'] <=> $b['price_per_night']);
+
+        return [
+            'hotels' => $hotels,
+            'meta'   => [
+                'total'       => count($hotels),
+                'destination' => $params['destination'] ?? '',
+                'checkin'     => $checkin,
+                'checkout'    => $checkout,
+                'nights'      => $nights,
+                'guests'      => $guests,
+                'is_mock'     => true,
+            ],
+        ];
+    }
+
+    // ──────────────────────────────────────────────────────────────
     //  HTTP HELPERS
     // ──────────────────────────────────────────────────────────────
 
