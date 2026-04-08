@@ -349,16 +349,17 @@ async function confirmPayment() {
                     <section class="mb-5 rounded-xl border border-gray-200 bg-white p-5">
                         <h2 class="mb-4 font-semibold text-gray-900">Payment details</h2>
 
-                        <!-- Stripe Payment Element mounts here -->
-                        <div ref="paymentEl" class="min-h-[120px]">
-                            <div v-if="!stripeReady" class="flex items-center gap-2 text-sm text-gray-400">
-                                <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                                </svg>
-                                Loading payment form...
-                            </div>
+                        <!-- Loading spinner — sibling of paymentEl, not inside it -->
+                        <div v-if="!stripeReady" class="flex min-h-[120px] items-center gap-2 text-sm text-gray-400">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                            </svg>
+                            Loading payment form...
                         </div>
+
+                        <!-- Stripe Payment Element mounts here — must stay empty so Stripe owns it fully -->
+                        <div ref="paymentEl"></div>
 
                         <p v-if="stripeError" class="mt-3 text-sm font-medium text-red-600">⚠ {{ stripeError }}</p>
                     </section>
