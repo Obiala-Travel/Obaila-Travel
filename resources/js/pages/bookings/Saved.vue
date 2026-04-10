@@ -62,7 +62,7 @@ function remove(flight: SavedFlight) {
         <!-- Header -->
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <h1 class="text-2xl font-bold text-gray-900">
                     Saved Flights
                 </h1>
                 <p class="mt-0.5 text-sm text-gray-500">{{ savedFlights.length }} saved route{{ savedFlights.length !== 1 ? 's' : '' }}</p>
@@ -107,7 +107,7 @@ function remove(flight: SavedFlight) {
                 </div>
 
                 <!-- Price -->
-                <span class="text-lg font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <span class="text-lg font-extrabold text-gray-900">
                     {{ formatPrice(flight.price, flight.currency) }}
                 </span>
 

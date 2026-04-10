@@ -229,7 +229,7 @@ function searchRoute(from: string, to: string) {
                     ✈ Powered by Duffel — Live Airline Data
                 </span>
                 <h1 class="mx-auto max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl"
-                    style="font-family:'Plus Jakarta Sans',sans-serif;">
+                   >
                     Your Next Journey<br />
                     <span class="text-blue-300">Starts Here.</span>
                 </h1>
@@ -442,7 +442,7 @@ function searchRoute(from: string, to: string) {
             <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
                 <div v-for="stat in STATS" :key="stat.label" class="text-center">
                     <div class="flex items-center justify-center gap-1">
-                        <p class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                        <p class="text-3xl font-extrabold text-gray-900">
                             {{ stat.value }}
                         </p>
                         <Star v-if="stat.star" class="h-5 w-5 fill-amber-400 text-amber-400" />
@@ -464,7 +464,7 @@ function searchRoute(from: string, to: string) {
                     <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
                         Featured Destinations
                     </span>
-                    <h2 class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                    <h2 class="text-3xl font-extrabold text-gray-900">
                         Popular Destinations<span class="text-blue-600">.</span>
                     </h2>
                 </div>
@@ -504,7 +504,7 @@ function searchRoute(from: string, to: string) {
                 <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
                     Why Obiala
                 </span>
-                <h2 class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <h2 class="text-3xl font-extrabold text-gray-900">
                     Built for Travellers Who Mean Business<span class="text-blue-600">.</span>
                 </h2>
                 <p class="mx-auto mt-3 max-w-xl text-sm text-gray-500">
@@ -535,7 +535,7 @@ function searchRoute(from: string, to: string) {
                 <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
                     Simple Process
                 </span>
-                <h2 class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <h2 class="text-3xl font-extrabold text-gray-900">
                     Book a Flight in 3 Easy Steps<span class="text-blue-600">.</span>
                 </h2>
             </div>
@@ -566,7 +566,7 @@ function searchRoute(from: string, to: string) {
                     <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
                         Top Routes
                     </span>
-                    <h2 class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                    <h2 class="text-3xl font-extrabold text-gray-900">
                         Popular Flight Routes<span class="text-blue-600">.</span>
                     </h2>
                 </div>
@@ -603,7 +603,7 @@ function searchRoute(from: string, to: string) {
                 <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
                     Testimonials
                 </span>
-                <h2 class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <h2 class="text-3xl font-extrabold text-gray-900">
                     What Our Travellers Say<span class="text-blue-600">.</span>
                 </h2>
             </div>
@@ -642,7 +642,7 @@ function searchRoute(from: string, to: string) {
             <span class="mb-3 inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-300">
                 Get Started Today
             </span>
-            <h2 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl" style="font-family:'Plus Jakarta Sans',sans-serif;">
+            <h2 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl">
                 Ready to Explore the World?
             </h2>
             <p class="mb-8 text-base text-blue-200/80">

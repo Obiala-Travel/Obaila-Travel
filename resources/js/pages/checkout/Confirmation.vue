@@ -95,7 +95,7 @@ const cabinLabel: Record<string, string> = {
             <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
                 <CheckCircle class="h-9 w-9 text-emerald-600" />
             </div>
-            <h1 class="text-2xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+            <h1 class="text-2xl font-extrabold text-gray-900">
                 Booking confirmed!
             </h1>
             <p class="mt-1.5 text-gray-500">
@@ -198,7 +198,7 @@ const cabinLabel: Record<string, string> = {
             </div>
             <div class="flex flex-col items-end justify-center rounded-xl border border-gray-200 bg-white p-4">
                 <p class="text-xs text-gray-400">Total paid</p>
-                <p class="text-3xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <p class="text-3xl font-extrabold text-gray-900">
                     {{ formatPrice(booking.total_price, booking.currency) }}
                 </p>
                 <p class="text-xs text-gray-400">All taxes and fees included</p>

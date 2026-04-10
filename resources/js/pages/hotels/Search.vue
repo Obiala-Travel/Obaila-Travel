@@ -271,7 +271,7 @@ const meta = computed(() => props.meta);
                 <!-- Sort bar -->
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <p class="font-semibold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                        <p class="font-semibold text-gray-900">
                             <span class="text-blue-600">{{ filteredHotels.length }}</span> properties in
                             {{ params.destination }}
                         </p>
@@ -365,7 +365,7 @@ const meta = computed(() => props.meta);
                         <div class="flex flex-shrink-0 flex-col items-end justify-center border-l border-gray-100 p-4 sm:min-w-[140px]">
                             <span class="text-[10px] text-gray-400">per night</span>
                             <span class="font-extrabold leading-none text-gray-900"
-                                  style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;">
+                                  class="text-2xl font-extrabold">
                                 {{ formatPrice(hotel.price_per_night, hotel.currency) }}
                             </span>
                             <span class="mt-0.5 text-[11px] text-gray-400">

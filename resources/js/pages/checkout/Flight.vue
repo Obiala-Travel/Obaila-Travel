@@ -203,7 +203,7 @@ async function confirmPayment() {
     <Head :title="`Checkout — ${offer.origin} → ${offer.destination} — Obiala`" />
 
     <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <h1 class="mb-2 text-2xl font-bold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+        <h1 class="mb-2 text-2xl font-bold text-gray-900">
             Complete your booking
         </h1>
 
@@ -449,7 +449,7 @@ async function confirmPayment() {
 
                     <div class="flex items-baseline justify-between">
                         <span class="text-sm font-semibold text-gray-700">Total</span>
-                        <span class="text-2xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                        <span class="text-2xl font-extrabold text-gray-900">
                             {{ formatPrice(offer.price, offer.currency) }}
                         </span>
                     </div>

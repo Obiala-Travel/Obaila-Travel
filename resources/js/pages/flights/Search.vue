@@ -342,7 +342,7 @@ const tripLabel = computed(() => {
                 <!-- Sort bar -->
                 <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <p class="font-semibold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                        <p class="font-semibold text-gray-900">
                             Showing
                             <span class="text-blue-600">{{ filteredOffers.length }}</span>
                             flights
@@ -437,7 +437,7 @@ const tripLabel = computed(() => {
                             <div class="ml-auto flex flex-shrink-0 flex-col items-end gap-1">
                                 <span class="text-[10px] text-gray-400">{{ offer.currency }}</span>
                                 <span class="font-extrabold leading-none text-gray-900"
-                                      style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.5rem;">
+                                      class="text-2xl font-extrabold">
                                     {{ formatPrice(offer.price, offer.currency) }}
                                 </span>
                                 <span class="text-[10px] text-gray-400">per person</span>

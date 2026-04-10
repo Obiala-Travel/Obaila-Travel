@@ -56,7 +56,7 @@ const cabinLabel: Record<string, string> = {
         <!-- Header -->
         <div class="mb-6 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                <h1 class="text-2xl font-bold text-gray-900">
                     My Bookings
                 </h1>
                 <p class="mt-0.5 text-sm text-gray-500">{{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }} total</p>
@@ -114,7 +114,7 @@ const cabinLabel: Record<string, string> = {
 
                 <!-- Price + reference -->
                 <div class="flex flex-col items-end gap-1">
-                    <span class="text-lg font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
+                    <span class="text-lg font-extrabold text-gray-900">
                         {{ formatPrice(booking.total_price, booking.currency) }}
                     </span>
                     <span class="font-mono text-xs text-gray-400">{{ booking.reference }}</span>
