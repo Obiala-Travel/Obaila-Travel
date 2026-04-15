@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { ref, computed, onMounted } from 'vue';
-import {
-    MapPin, Star, Wifi, Car, UtensilsCrossed, Waves,
-    Dumbbell, ChevronDown, SlidersHorizontal, Search,
-    Users, CalendarDays, Lightbulb,
-} from 'lucide-vue-next';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
 defineOptions({ layout: GuestLayout });
@@ -68,12 +63,12 @@ const maxPrice = computed(() => Math.max(...props.hotels.map(h => h.price_per_ni
 onMounted(() => { filterMaxPrice.value = maxPrice.value; });
 
 const AMENITY_FILTERS = [
-    { key: 'Pool',      label: 'Pool',              icon: '🛁' },
-    { key: 'WiFi',      label: 'Free WiFi',         icon: '📶' },
-    { key: 'Parking',   label: 'Parking',           icon: '🅿️' },
-    { key: 'Breakfast', label: 'Breakfast',         icon: '🍳' },
-    { key: 'Gym',       label: 'Gym / Fitness',     icon: '💪' },
-    { key: 'Spa',       label: 'Spa',               icon: '🧖' },
+    { key: 'Pool',      label: 'Pool' },
+    { key: 'WiFi',      label: 'Free WiFi' },
+    { key: 'Parking',   label: 'Parking' },
+    { key: 'Breakfast', label: 'Breakfast' },
+    { key: 'Gym',       label: 'Gym / Fitness' },
+    { key: 'Spa',       label: 'Spa' },
 ];
 
 function toggleAmenity(key: string) {
@@ -128,10 +123,10 @@ function starArray(n: number): number[] {
 }
 
 const ratingBg: Record<string, string> = {
-    Exceptional: 'bg-emerald-600',
-    Excellent:   'bg-blue-700',
-    'Very Good': 'bg-blue-600',
-    Good:        'bg-blue-500',
+    Exceptional: 'bg-success',
+    Excellent:   'bg-primary',
+    'Very Good': 'bg-info',
+    Good:        'bg-secondary',
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -148,257 +143,293 @@ function bookHotel(hotel: Hotel) {
 }
 
 // ── Labels ─────────────────────────────────────────────────────────────────
+const meta = computed(() => props.meta);
 const nightsLabel = computed(() =>
     `${meta.value.nights} night${meta.value.nights !== 1 ? 's' : ''}`
 );
-const meta = computed(() => props.meta);
+
+const amenityIcons: Record<string, string> = {
+    'WiFi': 'isax-home-wifi',
+    'Pool': 'isax-wind-2',
+    'Parking': 'isax-car',
+    'Breakfast': 'isax-coffee',
+    'Gym': 'isax-weight',
+    'Spa': 'isax-scissor',
+};
 </script>
 
 <template>
     <Head :title="`Hotels in ${params.destination} — Obiala`" />
 
-    <!-- ── Search summary bar ─────────────────────────────────────────── -->
-    <div class="sticky top-16 z-40 border-b border-gray-200 bg-white shadow-sm">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
-
-            <!-- Destination pill -->
-            <div class="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-                🏨 {{ params.destination }}
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar breadcrumb-bg-01 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="breadcrumb-title mb-2">Hotels in {{ params.destination }}</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center mb-0">
+                            <li class="breadcrumb-item"><a href="/"><i class="isax isax-home5"></i></a></li>
+                            <li class="breadcrumb-item">Hotels</li>
+                            <li class="breadcrumb-item active">Search Results</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-
-            <!-- Dates pill -->
-            <div class="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600">
-                <CalendarDays class="h-3.5 w-3.5 text-gray-400" />
-                {{ formatDate(params.checkin) }} → {{ formatDate(params.checkout) }}
-                <span class="ml-1 text-gray-400">· {{ nightsLabel }}</span>
-            </div>
-
-            <!-- Guests pill -->
-            <div class="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600">
-                <Users class="h-3.5 w-3.5 text-gray-400" />
-                {{ params.guests }} guest{{ params.guests > 1 ? 's' : '' }}
-                · {{ params.rooms }} room{{ params.rooms > 1 ? 's' : '' }}
-            </div>
-
-            <!-- Modify search -->
-            <button @click="modifySearch"
-                    class="ml-auto flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
-                <Search class="h-3.5 w-3.5" />
-                Modify search
-            </button>
         </div>
     </div>
+    <!-- /Breadcrumb -->
 
-    <!-- ── Main content ──────────────────────────────────────────────── -->
-    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+    <!-- Page Wrapper -->
+    <div class="content">
+        <div class="container">
 
-        <!-- Mobile filter toggle -->
-        <div class="mb-4 flex items-center justify-between lg:hidden">
-            <p class="text-sm text-gray-500">
-                <span class="font-semibold text-gray-900">{{ filteredHotels.length }}</span> properties found
-            </p>
-            <button @click="showFilters = !showFilters"
-                    class="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-300 hover:bg-blue-50">
-                <SlidersHorizontal class="h-4 w-4" />
-                Filters
-            </button>
-        </div>
-
-        <div class="flex gap-6">
-
-            <!-- ── Sidebar ──────────────────────────────────────────── -->
-            <aside :class="['w-64 flex-shrink-0 sticky top-32 self-start', showFilters ? 'block' : 'hidden lg:block']">
-
-                <!-- Price filter -->
-                <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
-                    <div class="mb-3 flex items-center justify-between text-sm font-semibold text-gray-900">
-                        Max price / night
-                        <span class="font-normal text-blue-600">
-                            {{ filterMaxPrice >= maxPrice ? 'Any' : formatPrice(filterMaxPrice, params.currency) }}
-                        </span>
-                    </div>
-                    <input type="range" :min="0" :max="maxPrice" step="5" v-model.number="filterMaxPrice"
-                           class="w-full accent-blue-600" />
-                    <div class="mt-1 flex justify-between text-xs text-gray-400">
-                        <span>{{ params.currency }} 0</span>
-                        <span>{{ formatPrice(maxPrice, params.currency) }}</span>
+            <!-- Search summary bar -->
+            <div class="card mb-4">
+                <div class="card-body py-3">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2 rounded-pill bg-light-200 px-3 py-2">
+                            <i class="isax isax-building fs-16 text-primary"></i>
+                            <span class="fw-semibold fs-14">{{ params.destination }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 rounded-pill border px-3 py-2 fs-14 text-gray-6">
+                            <i class="isax isax-calendar fs-14 text-gray-5"></i>
+                            {{ formatDate(params.checkin) }} → {{ formatDate(params.checkout) }}
+                            <span class="text-muted">· {{ nightsLabel }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 rounded-pill border px-3 py-2 fs-14 text-gray-6">
+                            <i class="isax isax-profile-2user fs-14 text-gray-5"></i>
+                            {{ params.guests }} guest{{ params.guests > 1 ? 's' : '' }}
+                            · {{ params.rooms }} room{{ params.rooms > 1 ? 's' : '' }}
+                        </div>
+                        <button @click="modifySearch"
+                                class="btn btn-outline-primary btn-sm ms-auto d-flex align-items-center gap-2">
+                            <i class="isax isax-search-normal fs-14"></i>
+                            Modify search
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Star rating filter -->
-                <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
-                    <div class="mb-3 text-sm font-semibold text-gray-900">Min. star rating</div>
-                    <div class="flex flex-col gap-2">
-                        <label v-for="s in [{ v: 0, l: 'Any' }, { v: 3, l: '3+ Stars' }, { v: 4, l: '4+ Stars' }, { v: 5, l: '5 Stars only' }]"
-                               :key="s.v" class="flex cursor-pointer items-center gap-2.5">
-                            <input type="radio" name="stars" :value="s.v" v-model.number="filterStars" class="accent-blue-600" />
-                            <span class="text-sm text-gray-700">{{ s.l }}</span>
-                        </label>
+            <!-- Mobile filter toggle -->
+            <div class="d-flex align-items-center justify-content-between mb-3 d-lg-none">
+                <p class="fs-14 text-muted mb-0">
+                    <span class="fw-semibold text-gray-9">{{ filteredHotels.length }}</span> properties found
+                </p>
+                <button @click="showFilters = !showFilters"
+                        class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                    <i class="isax isax-setting-5 fs-14"></i>
+                    Filters
+                </button>
+            </div>
+
+            <div class="row">
+
+                <!-- Sidebar -->
+                <div :class="['col-xl-3 col-lg-3 theiaStickySidebar', showFilters ? '' : 'd-none d-lg-block']">
+                    <div class="card filter-sidebar mb-4 mb-lg-0">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0">Filters</h5>
+                            <a href="#" class="fs-14 link-primary" @click.prevent="filterMaxPrice = maxPrice; filterStars = 0; filterAmenities = []">Reset</a>
+                        </div>
+                        <div class="card-body p-0">
+
+                            <!-- Price filter -->
+                            <div class="accordion accordion-list">
+                                <div class="accordion-item border-bottom p-3">
+                                    <div class="accordion-header">
+                                        <div class="accordion-button p-0" data-bs-toggle="collapse"
+                                             data-bs-target="#acc-price" aria-expanded="true" role="button">
+                                            <i class="isax isax-coin me-2 text-primary"></i>Price Per Night
+                                        </div>
+                                    </div>
+                                    <div id="acc-price" class="accordion-collapse collapse show">
+                                        <div class="accordion-body pt-2">
+                                            <input type="range" class="form-range"
+                                                   :min="0" :max="maxPrice" step="5"
+                                                   v-model.number="filterMaxPrice" />
+                                            <div class="filter-range-amount">
+                                                <p class="fs-14 mb-0">Max:
+                                                    <span class="text-gray-9 fw-medium">
+                                                        {{ filterMaxPrice >= maxPrice ? 'Any' : formatPrice(filterMaxPrice, params.currency) }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Star rating filter -->
+                                <div class="accordion-item border-bottom p-3">
+                                    <div class="accordion-header">
+                                        <div class="accordion-button p-0" data-bs-toggle="collapse"
+                                             data-bs-target="#acc-stars" aria-expanded="true" role="button">
+                                            <i class="isax isax-star me-2 text-primary"></i>Star Rating
+                                        </div>
+                                    </div>
+                                    <div id="acc-stars" class="accordion-collapse collapse show">
+                                        <div class="accordion-body pt-2">
+                                            <div v-for="s in [{ v: 0, l: 'Any' }, { v: 3, l: '3+ Stars' }, { v: 4, l: '4+ Stars' }, { v: 5, l: '5 Stars only' }]"
+                                                 :key="s.v"
+                                                 class="form-check d-flex align-items-center ps-0 mb-2">
+                                                <input class="form-check-input ms-0 mt-0" type="radio"
+                                                       name="stars" :id="`star-${s.v}`"
+                                                       :value="s.v" v-model.number="filterStars" />
+                                                <label class="form-check-label ms-2" :for="`star-${s.v}`">{{ s.l }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Amenities filter -->
+                                <div class="accordion-item p-3">
+                                    <div class="accordion-header">
+                                        <div class="accordion-button p-0" data-bs-toggle="collapse"
+                                             data-bs-target="#acc-amenities" aria-expanded="true" role="button">
+                                            <i class="isax isax-candle me-2 text-primary"></i>Amenities
+                                        </div>
+                                    </div>
+                                    <div id="acc-amenities" class="accordion-collapse collapse show">
+                                        <div class="accordion-body pt-2">
+                                            <div v-for="am in AMENITY_FILTERS" :key="am.key"
+                                                 class="form-check d-flex align-items-center ps-0 mb-2">
+                                                <input class="form-check-input ms-0 mt-0" type="checkbox"
+                                                       :id="`am-${am.key}`"
+                                                       :checked="filterAmenities.includes(am.key)"
+                                                       @change="toggleAmenity(am.key)" />
+                                                <label class="form-check-label ms-2" :for="`am-${am.key}`">{{ am.label }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+                <!-- /Sidebar -->
 
-                <!-- Amenities filter -->
-                <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
-                    <div class="mb-3 text-sm font-semibold text-gray-900">Amenities</div>
-                    <div class="flex flex-col gap-2">
-                        <label v-for="am in AMENITY_FILTERS" :key="am.key"
-                               class="flex cursor-pointer items-center gap-2.5">
-                            <input type="checkbox"
-                                   :checked="filterAmenities.includes(am.key)"
-                                   @change="toggleAmenity(am.key)"
-                                   class="accent-blue-600 rounded" />
-                            <span class="text-sm text-gray-700">{{ am.icon }} {{ am.label }}</span>
-                        </label>
-                    </div>
-                </div>
+                <!-- Results -->
+                <div class="col-xl-9 col-lg-9">
 
-                <!-- Travel tip card -->
-                <div class="rounded-xl border border-amber-100 bg-amber-50 p-4">
-                    <div class="mb-2 flex items-center gap-2 text-sm font-semibold text-amber-800">
-                        <Lightbulb class="h-4 w-4" />
-                        Travel Tip
-                    </div>
-                    <p class="text-xs leading-relaxed text-amber-700">
-                        Book midweek for up to 30% savings. Prices are lowest on Tuesdays and Wednesdays.
-                    </p>
-                </div>
-
-            </aside>
-
-            <!-- ── Results area ─────────────────────────────────────── -->
-            <div class="min-w-0 flex-1">
-
-                <!-- Sort bar -->
-                <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <p class="font-semibold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
-                            <span class="text-blue-600">{{ filteredHotels.length }}</span> properties in
-                            {{ params.destination }}
-                        </p>
-                        <p class="mt-0.5 text-xs text-gray-500">
-                            {{ formatDate(params.checkin) }} – {{ formatDate(params.checkout) }}
-                            · {{ nightsLabel }} · {{ params.guests }} guest{{ params.guests > 1 ? 's' : '' }}
-                            <span v-if="meta.is_mock" class="ml-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
-                                Demo data
-                            </span>
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500">Sort by:</span>
-                        <div class="relative">
-                            <select v-model="sortBy"
-                                    class="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-white py-1.5 pl-3 pr-8 text-sm font-medium text-gray-700 focus:border-blue-500 focus:outline-none">
+                    <!-- Sort bar -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                        <div>
+                            <h6 class="mb-1">
+                                <span class="text-primary">{{ filteredHotels.length }}</span> properties in {{ params.destination }}
+                            </h6>
+                            <p class="fs-12 text-muted mb-0">
+                                {{ formatDate(params.checkin) }} – {{ formatDate(params.checkout) }}
+                                · {{ nightsLabel }} · {{ params.guests }} guest{{ params.guests > 1 ? 's' : '' }}
+                                <span v-if="meta.is_mock" class="badge bg-warning text-dark ms-1 fs-10">Demo data</span>
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="fs-13 text-muted">Sort by:</span>
+                            <select v-model="sortBy" class="form-select form-select-sm" style="width:auto">
                                 <option value="price">Price ↑</option>
                                 <option value="rating">Rating ↓</option>
                                 <option value="stars">Stars ↓</option>
                                 <option value="name">Name A–Z</option>
                             </select>
-                            <ChevronDown class="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
                         </div>
                     </div>
-                </div>
 
-                <!-- Empty state -->
-                <div v-if="filteredHotels.length === 0"
-                     class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-16 text-center">
-                    <div class="mb-4 text-5xl">🏨</div>
-                    <p class="text-base font-bold text-gray-900">No properties found</p>
-                    <p class="mt-1 text-sm text-gray-500">Try adjusting your filters or different dates.</p>
-                    <button @click="modifySearch"
-                            class="mt-5 rounded-xl px-6 py-2.5 text-sm font-semibold text-white"
-                            style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                        New search
-                    </button>
-                </div>
-
-                <!-- Hotel cards -->
-                <TransitionGroup name="fade-up" tag="div" class="flex flex-col gap-3">
-                    <article
-                        v-for="(hotel, idx) in filteredHotels"
-                        :key="hotel.id"
-                        :style="{ animationDelay: `${idx * 0.05}s` }"
-                        class="hotel-card flex overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:-translate-y-px hover:border-blue-300 hover:shadow-md"
-                    >
-                        <!-- Thumbnail -->
-                        <div class="relative flex w-36 flex-shrink-0 items-center justify-center bg-gray-100 text-5xl sm:w-44">
-                            {{ hotel.emoji }}
-                            <span v-if="hotel.free_cancel"
-                                  class="absolute left-2 top-2 rounded bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                                Free cancel
-                            </span>
+                    <!-- Empty state -->
+                    <div v-if="filteredHotels.length === 0"
+                         class="card text-center py-5">
+                        <div class="card-body">
+                            <div class="fs-1 mb-3">🏨</div>
+                            <h5 class="mb-2">No properties found</h5>
+                            <p class="text-muted fs-14">Try adjusting your filters or different dates.</p>
+                            <button @click="modifySearch" class="btn btn-primary mt-2">New search</button>
                         </div>
+                    </div>
 
-                        <!-- Body -->
-                        <div class="flex min-w-0 flex-1 flex-col gap-2 p-4">
-                            <h3 class="truncate font-bold text-gray-900">{{ hotel.name }}</h3>
+                    <!-- Hotel cards -->
+                    <div class="hotel-list">
+                        <div v-for="hotel in filteredHotels" :key="hotel.id" class="place-item mb-4">
 
-                            <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                                <MapPin class="h-3 w-3 flex-shrink-0" />
-                                {{ hotel.destination }} · {{ TYPE_LABELS[hotel.type] ?? hotel.type }}
-                            </div>
-
-                            <!-- Stars + score -->
-                            <div class="flex items-center gap-3">
-                                <div class="flex gap-0.5">
-                                    <span v-for="(filled, si) in starArray(hotel.stars)" :key="si"
-                                          :class="filled ? 'text-amber-400' : 'text-gray-200'"
-                                          class="text-sm">★</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <span :class="['rounded px-1.5 py-0.5 text-xs font-bold text-white', ratingBg[hotel.rating_label] ?? 'bg-blue-600']">
-                                        {{ hotel.rating }}
+                            <div class="d-flex overflow-hidden rounded-2 border">
+                                <!-- Thumbnail -->
+                                <div class="position-relative d-flex align-items-center justify-content-center bg-light flex-shrink-0"
+                                     style="width:160px;min-height:140px;font-size:3rem">
+                                    {{ hotel.emoji }}
+                                    <span v-if="hotel.free_cancel"
+                                          class="position-absolute top-0 start-0 m-2 badge bg-success fs-10 text-uppercase fw-bold">
+                                        Free cancel
                                     </span>
-                                    <span class="text-xs text-gray-500">{{ hotel.rating_label }}</span>
+                                </div>
+
+                                <!-- Body -->
+                                <div class="place-content flex-1 p-3 pb-2 min-w-0">
+                                    <div class="d-flex align-items-start justify-content-between flex-wrap">
+                                        <div>
+                                            <h5 class="mb-1 text-truncate">{{ hotel.name }}</h5>
+                                            <p class="d-flex align-items-center mb-2 fs-14 text-gray-6">
+                                                <i class="isax isax-location5 me-2"></i>
+                                                {{ hotel.destination }} · {{ TYPE_LABELS[hotel.type] ?? hotel.type }}
+                                            </p>
+                                        </div>
+                                        <!-- Rating badge -->
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <span :class="['badge fs-12 fw-bold', ratingBg[hotel.rating_label] ?? 'bg-secondary']">
+                                                {{ hotel.rating }}
+                                            </span>
+                                            <span class="fs-13 text-muted">{{ hotel.rating_label }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stars -->
+                                    <div class="mb-2">
+                                        <span v-for="(filled, si) in starArray(hotel.stars)" :key="si"
+                                              :class="filled ? 'text-warning' : 'text-light-200'"
+                                              class="fs-14">★</span>
+                                    </div>
+
+                                    <!-- Facilities row -->
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap border-top pt-2 mt-1">
+                                        <div class="d-flex align-items-center gap-1 mb-2 flex-wrap">
+                                            <span class="fs-14 fw-medium me-1">Facilities:</span>
+                                            <template v-for="(am, ai) in hotel.amenities.slice(0, 4)" :key="ai">
+                                                <i :class="['isax me-1 text-primary fs-16', amenityIcons[am] ?? 'isax-tick-circle']"
+                                                   :title="am"></i>
+                                            </template>
+                                            <a v-if="hotel.amenities.length > 4" href="#" class="fs-13 fw-normal text-default">
+                                                +{{ hotel.amenities.length - 4 }}
+                                            </a>
+                                        </div>
+
+                                        <!-- Price + book -->
+                                        <div class="d-flex align-items-center gap-3 mb-2">
+                                            <div class="text-end">
+                                                <h5 class="text-primary mb-0 text-nowrap">
+                                                    {{ formatPrice(hotel.price_per_night, hotel.currency) }}
+                                                    <span class="fs-14 fw-normal text-default">/ Night</span>
+                                                </h5>
+                                                <p class="fs-12 text-muted mb-0">
+                                                    {{ formatPrice(hotel.total_price, hotel.currency) }} total
+                                                </p>
+                                            </div>
+                                            <button @click="bookHotel(hotel)"
+                                                    class="btn btn-primary btn-sm text-nowrap">
+                                                Book now
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Amenity chips -->
-                            <div class="flex flex-wrap gap-1.5">
-                                <span v-for="am in hotel.amenities" :key="am"
-                                      class="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] text-gray-600">
-                                    {{ am }}
-                                </span>
-                            </div>
                         </div>
+                    </div>
+                    <!-- /Hotel cards -->
 
-                        <!-- Price column -->
-                        <div class="flex flex-shrink-0 flex-col items-end justify-center border-l border-gray-100 p-4 sm:min-w-[140px]">
-                            <span class="text-[10px] text-gray-400">per night</span>
-                            <span class="font-extrabold leading-none text-gray-900"
-                                  style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;">
-                                {{ formatPrice(hotel.price_per_night, hotel.currency) }}
-                            </span>
-                            <span class="mt-0.5 text-[11px] text-gray-400">
-                                {{ formatPrice(hotel.total_price, hotel.currency) }} total
-                            </span>
-
-                            <button @click="bookHotel(hotel)"
-                                    class="mt-3 rounded-lg px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:-translate-y-px hover:shadow-md"
-                                    style="background:#1c64f2">
-                                Book now
-                            </button>
-
-                            <span v-if="hotel.free_cancel"
-                                  class="mt-1.5 text-[11px] font-semibold text-emerald-600">
-                                ✓ Free cancellation
-                            </span>
-                        </div>
-                    </article>
-                </TransitionGroup>
+                </div>
+                <!-- /Results -->
 
             </div>
         </div>
     </div>
+    <!-- /Page Wrapper -->
+
 </template>
-
-<style scoped>
-.hotel-card { animation: fadeUp 0.3s both; }
-
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.fade-up-enter-active { transition: all 0.3s ease; }
-.fade-up-enter-from  { opacity: 0; transform: translateY(10px); }
-</style>

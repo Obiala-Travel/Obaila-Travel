@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import axios from 'axios';
 import { loadStripe, type Stripe, type StripeElements } from '@stripe/stripe-js';
-import { Lock, AlertCircle } from 'lucide-vue-next';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
 defineOptions({ layout: GuestLayout });
@@ -28,7 +27,7 @@ interface Offer {
     baggages: { carry_on: boolean; checked: boolean }
 }
 
-const props = defineProps<{ offer: Offer }>();
+defineProps<{ offer: Offer }>();
 
 const page       = usePage();
 const stripeKey  = computed(() => (page.props as any).stripeKey as string | null);
@@ -202,266 +201,361 @@ async function confirmPayment() {
 <template>
     <Head :title="`Checkout — ${offer.origin} → ${offer.destination} — Obiala`" />
 
-    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <h1 class="mb-2 text-2xl font-bold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
-            Complete your booking
-        </h1>
-
-        <!-- Step indicator -->
-        <div class="mb-6 flex items-center gap-2 text-sm">
-            <span :class="['font-semibold', step === 'details' ? 'text-blue-600' : 'text-gray-400']">
-                1. Passenger details
-            </span>
-            <span class="text-gray-300">→</span>
-            <span :class="['font-semibold', step === 'payment' ? 'text-blue-600' : 'text-gray-400']">
-                2. Payment
-            </span>
-        </div>
-
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-
-            <!-- ── LEFT: Form ────────────────────────────────────── -->
-            <div class="min-w-0 flex-1">
-
-                <!-- ── STEP 1: Passenger details ─────────────────── -->
-                <template v-if="step === 'details'">
-
-                    <!-- Global error -->
-                    <div v-if="generalError"
-                         class="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-                        <AlertCircle class="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
-                        <p class="text-sm font-medium text-red-700">{{ generalError }}</p>
-                    </div>
-
-                    <!-- Contact info -->
-                    <section class="mb-5 rounded-xl border border-gray-200 bg-white p-5">
-                        <h2 class="mb-4 font-semibold text-gray-900">Contact details</h2>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Email address *</label>
-                                <input v-model="form.contact_email" type="email" placeholder="you@email.com"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors.contact_email ? 'border-red-400 bg-red-50' : 'border-gray-200']" />
-                                <p v-if="form.errors.contact_email" class="mt-1 text-xs text-red-600">{{ form.errors.contact_email }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Phone number *</label>
-                                <input v-model="form.contact_phone" type="tel" placeholder="+44 7700 900000"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors.contact_phone ? 'border-red-400 bg-red-50' : 'border-gray-200']" />
-                                <p v-if="form.errors.contact_phone" class="mt-1 text-xs text-red-600">{{ form.errors.contact_phone }}</p>
-                            </div>
-                        </div>
-                        <p class="mt-2 text-xs text-gray-400">Booking confirmation and e-ticket will be sent here.</p>
-                    </section>
-
-                    <!-- Passenger forms -->
-                    <section v-for="(pax, idx) in form.passengers" :key="idx"
-                             class="mb-5 rounded-xl border border-gray-200 bg-white p-5">
-                        <h2 class="mb-4 font-semibold text-gray-900">
-                            Passenger {{ idx + 1 }}
-                            <span class="ml-2 text-xs font-normal text-gray-400">Adult</span>
-                        </h2>
-
-                        <!-- Title / First / Last -->
-                        <div class="mb-4 grid gap-3 sm:grid-cols-[100px_1fr_1fr]">
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Title *</label>
-                                <select v-model="pax.title" class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-                                    <option value="mr">Mr</option>
-                                    <option value="mrs">Mrs</option>
-                                    <option value="ms">Ms</option>
-                                    <option value="dr">Dr</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">First name *</label>
-                                <input v-model="pax.first_name" type="text" placeholder="As on passport"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors[`passengers.${idx}.first_name`] ? 'border-red-400' : 'border-gray-200']" />
-                                <p v-if="form.errors[`passengers.${idx}.first_name`]" class="mt-1 text-xs text-red-600">{{ form.errors[`passengers.${idx}.first_name`] }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Last name *</label>
-                                <input v-model="pax.last_name" type="text" placeholder="As on passport"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors[`passengers.${idx}.last_name`] ? 'border-red-400' : 'border-gray-200']" />
-                                <p v-if="form.errors[`passengers.${idx}.last_name`]" class="mt-1 text-xs text-red-600">{{ form.errors[`passengers.${idx}.last_name`] }}</p>
-                            </div>
-                        </div>
-
-                        <!-- DOB / Gender / Nationality -->
-                        <div class="mb-4 grid gap-3 sm:grid-cols-3">
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Date of birth *</label>
-                                <input v-model="pax.date_of_birth" type="date" :max="todayStr"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors[`passengers.${idx}.date_of_birth`] ? 'border-red-400' : 'border-gray-200']" />
-                                <p v-if="form.errors[`passengers.${idx}.date_of_birth`]" class="mt-1 text-xs text-red-600">{{ form.errors[`passengers.${idx}.date_of_birth`] }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Gender *</label>
-                                <select v-model="pax.gender" class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-                                    <option value="m">Male</option>
-                                    <option value="f">Female</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Nationality *</label>
-                                <select v-model="pax.nationality"
-                                        :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500',
-                                                 form.errors[`passengers.${idx}.nationality`] ? 'border-red-400' : 'border-gray-200']">
-                                    <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">{{ c.name }}</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Passport number / Expiry -->
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Passport / ID number *</label>
-                                <input v-model="pax.passport_number" type="text" placeholder="e.g. 123456789"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors[`passengers.${idx}.passport_number`] ? 'border-red-400' : 'border-gray-200']" />
-                                <p v-if="form.errors[`passengers.${idx}.passport_number`]" class="mt-1 text-xs text-red-600">{{ form.errors[`passengers.${idx}.passport_number`] }}</p>
-                            </div>
-                            <div>
-                                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">Passport expiry *</label>
-                                <input v-model="pax.passport_expiry" type="date" :min="todayStr"
-                                       :class="['w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100',
-                                                form.errors[`passengers.${idx}.passport_expiry`] ? 'border-red-400' : 'border-gray-200']" />
-                                <p v-if="form.errors[`passengers.${idx}.passport_expiry`]" class="mt-1 text-xs text-red-600">{{ form.errors[`passengers.${idx}.passport_expiry`] }}</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Continue button -->
-                    <button @click="proceedToPayment" :disabled="processing"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-base font-bold text-white shadow-md transition hover:opacity-90 disabled:opacity-60"
-                            style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                        {{ processing ? 'Saving details...' : `Continue to payment — ${formatPrice(offer.price, offer.currency)}` }}
-                    </button>
-                    <p class="mt-2 text-center text-xs text-gray-400">🔒 Encrypted and secure. You won't be charged yet.</p>
-                </template>
-
-                <!-- ── STEP 2: Stripe Payment Element ─────────────── -->
-                <template v-if="step === 'payment'">
-                    <section class="mb-5 rounded-xl border border-gray-200 bg-white p-5">
-                        <h2 class="mb-4 font-semibold text-gray-900">Payment details</h2>
-
-                        <!-- Loading spinner — sibling of paymentEl, not inside it -->
-                        <div v-if="!stripeReady" class="flex min-h-[120px] items-center gap-2 text-sm text-gray-400">
-                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                            </svg>
-                            Loading payment form...
-                        </div>
-
-                        <!-- Stripe Payment Element mounts here — must stay empty so Stripe owns it fully -->
-                        <div ref="paymentEl"></div>
-
-                        <p v-if="stripeError" class="mt-3 text-sm font-medium text-red-600">⚠ {{ stripeError }}</p>
-                    </section>
-
-                    <!-- Pay button -->
-                    <button @click="confirmPayment" :disabled="processing || !stripeReady"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-base font-bold text-white shadow-md transition hover:opacity-90 disabled:opacity-60"
-                            style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                        <Lock class="h-4 w-4" />
-                        {{ processing ? 'Processing payment...' : `Pay ${formatPrice(offer.price, offer.currency)}` }}
-                    </button>
-
-                    <p class="mt-2 text-center text-xs text-gray-400">
-                        🔒 Payments processed securely by Stripe. We never store your card details.
-                    </p>
-
-                    <button @click="step = 'details'"
-                            class="mt-3 w-full text-center text-sm text-gray-400 underline hover:text-gray-600">
-                        ← Back to passenger details
-                    </button>
-                </template>
-            </div>
-
-            <!-- ── RIGHT: Order summary ───────────────────────────── -->
-            <div class="w-full lg:w-80 lg:flex-shrink-0">
-                <div class="sticky top-24 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <h2 class="mb-4 font-semibold text-gray-900">Order summary</h2>
-
-                    <!-- Airline -->
-                    <div class="mb-4 flex items-center gap-3">
-                        <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gray-50">
-                            <img :src="airlineLogoUrl(offer.airline_iata)" :alt="offer.airline_name"
-                                 class="h-full w-full object-contain p-1"
-                                 @error="($event.target as HTMLImageElement).style.display='none'" />
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">{{ offer.airline_name }}</p>
-                            <p class="text-xs text-gray-400">{{ offer.flight_number }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Route -->
-                    <div class="mb-4 rounded-lg bg-gray-50 p-3">
-                        <div class="flex items-center justify-between">
-                            <div class="text-center">
-                                <p class="text-lg font-bold text-gray-900">{{ formatTime(offer.departs_at) }}</p>
-                                <p class="text-xs font-semibold text-gray-500">{{ offer.origin }}</p>
-                            </div>
-                            <div class="flex flex-col items-center gap-0.5 px-2">
-                                <div class="h-px w-16 bg-gray-300"></div>
-                                <p class="text-[10px] text-gray-400">{{ parseDuration(offer.duration) }}</p>
-                                <p class="text-[10px] text-gray-400">{{ offer.stop_label }}</p>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-lg font-bold text-gray-900">{{ formatTime(offer.arrives_at) }}</p>
-                                <p class="text-xs font-semibold text-gray-500">{{ offer.destination }}</p>
-                            </div>
-                        </div>
-                        <p class="mt-2 text-center text-[11px] text-gray-400">{{ formatDate(offer.departs_at) }}</p>
-                    </div>
-
-                    <!-- Details -->
-                    <div class="mb-4 flex flex-col gap-2 text-sm">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Cabin</span>
-                            <span class="font-medium capitalize">{{ cabinLabel[offer.cabin_class] ?? offer.cabin_class }}</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Passengers</span>
-                            <span class="font-medium">{{ passengerCount }} Adult</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Carry-on</span>
-                            <span :class="offer.baggages.carry_on ? 'font-medium text-emerald-600' : 'text-gray-400'">
-                                {{ offer.baggages.carry_on ? '✓ Included' : 'Not included' }}
-                            </span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Checked bag</span>
-                            <span :class="offer.baggages.checked ? 'font-medium text-emerald-600' : 'text-gray-400'">
-                                {{ offer.baggages.checked ? '✓ Included' : 'Not included' }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="my-3 border-t border-gray-100"></div>
-
-                    <div class="flex items-baseline justify-between">
-                        <span class="text-sm font-semibold text-gray-700">Total</span>
-                        <span class="text-2xl font-extrabold text-gray-900" style="font-family:'Plus Jakarta Sans',sans-serif;">
-                            {{ formatPrice(offer.price, offer.currency) }}
-                        </span>
-                    </div>
-                    <p class="mt-1 text-right text-xs text-gray-400">All taxes and fees included</p>
-
-                    <div class="mt-4 flex flex-col gap-1.5 text-xs text-gray-400">
-                        <span>🔒 Secure 256-bit SSL encryption</span>
-                        <span>✈️ Instant booking confirmation</span>
-                        <span>📧 E-ticket sent to your email</span>
-                    </div>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar breadcrumb-bg-05 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="breadcrumb-title mb-2">
+                        <i class="isax isax-airplane rotate-45 me-2"></i>
+                        {{ offer.origin }} → {{ offer.destination }}
+                    </h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center mb-0">
+                            <li class="breadcrumb-item"><a href="/"><i class="isax isax-home5"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/flights/search">Flights</a></li>
+                            <li class="breadcrumb-item active">Checkout</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
+    <!-- /Breadcrumb -->
+
+    <!-- Page Wrapper -->
+    <div class="content content-two">
+        <div class="container">
+            <div class="row">
+
+                <!-- ── Left: Forms ──────────────────────────────────────── -->
+                <div class="col-lg-8">
+
+                    <!-- ── STEP 1: Passenger details ──────────────────── -->
+                    <template v-if="step === 'details'">
+
+                        <!-- Global error -->
+                        <div v-if="generalError"
+                             class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+                            <i class="isax isax-info-circle flex-shrink-0"></i>
+                            {{ generalError }}
+                        </div>
+
+                        <div class="card checkout-card mb-4">
+                            <div class="card-header">
+                                <h5>
+                                    Secure Checkout
+                                    <i class="isax isax-shield-security ms-2 text-success"></i>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+
+                                <!-- Contact info -->
+                                <div class="checkout-title">
+                                    <h6 class="mb-2">Contact Details</h6>
+                                </div>
+                                <div class="checkout-details pb-2 border-bottom mb-4">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                                <input v-model="form.contact_email" type="email"
+                                                       placeholder="you@email.com"
+                                                       :class="['form-control', form.errors.contact_email ? 'is-invalid' : '']" />
+                                                <div v-if="form.errors.contact_email" class="invalid-feedback">{{ form.errors.contact_email }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                                <input v-model="form.contact_phone" type="tel"
+                                                       placeholder="+44 7700 900000"
+                                                       :class="['form-control', form.errors.contact_phone ? 'is-invalid' : '']" />
+                                                <div v-if="form.errors.contact_phone" class="invalid-feedback">{{ form.errors.contact_phone }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted fs-12 mb-0">Booking confirmation and e-ticket will be sent here.</p>
+                                </div>
+
+                                <!-- Passenger forms -->
+                                <div v-for="(pax, idx) in form.passengers" :key="idx">
+                                    <div class="checkout-title">
+                                        <h6 class="mb-2">
+                                            Passenger {{ idx + 1 }}
+                                            <span class="badge bg-primary ms-2 fs-11">Adult</span>
+                                        </h6>
+                                    </div>
+                                    <div class="checkout-details">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                    <select v-model="pax.title" class="form-select">
+                                                        <option value="mr">Mr</option>
+                                                        <option value="mrs">Mrs</option>
+                                                        <option value="ms">Ms</option>
+                                                        <option value="dr">Dr</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                                    <input v-model="pax.first_name" type="text" placeholder="As on passport"
+                                                           :class="['form-control', form.errors[`passengers.${idx}.first_name`] ? 'is-invalid' : '']" />
+                                                    <div v-if="form.errors[`passengers.${idx}.first_name`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.first_name`] }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-5 col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                                    <input v-model="pax.last_name" type="text" placeholder="As on passport"
+                                                           :class="['form-control', form.errors[`passengers.${idx}.last_name`] ? 'is-invalid' : '']" />
+                                                    <div v-if="form.errors[`passengers.${idx}.last_name`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.last_name`] }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                                    <input v-model="pax.date_of_birth" type="date" :max="todayStr"
+                                                           :class="['form-control', form.errors[`passengers.${idx}.date_of_birth`] ? 'is-invalid' : '']" />
+                                                    <div v-if="form.errors[`passengers.${idx}.date_of_birth`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.date_of_birth`] }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                    <select v-model="pax.gender" class="form-select">
+                                                        <option value="m">Male</option>
+                                                        <option value="f">Female</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Nationality <span class="text-danger">*</span></label>
+                                                    <select v-model="pax.nationality"
+                                                            :class="['form-select', form.errors[`passengers.${idx}.nationality`] ? 'is-invalid' : '']">
+                                                        <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">{{ c.name }}</option>
+                                                    </select>
+                                                    <div v-if="form.errors[`passengers.${idx}.nationality`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.nationality`] }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Passport / ID Number <span class="text-danger">*</span></label>
+                                                    <input v-model="pax.passport_number" type="text" placeholder="e.g. 123456789"
+                                                           :class="['form-control', form.errors[`passengers.${idx}.passport_number`] ? 'is-invalid' : '']" />
+                                                    <div v-if="form.errors[`passengers.${idx}.passport_number`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.passport_number`] }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Passport Expiry <span class="text-danger">*</span></label>
+                                                    <input v-model="pax.passport_expiry" type="date" :min="todayStr"
+                                                           :class="['form-control', form.errors[`passengers.${idx}.passport_expiry`] ? 'is-invalid' : '']" />
+                                                    <div v-if="form.errors[`passengers.${idx}.passport_expiry`]" class="invalid-feedback">{{ form.errors[`passengers.${idx}.passport_expiry`] }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Continue button -->
+                        <div class="d-grid mb-2">
+                            <button @click="proceedToPayment" :disabled="processing"
+                                    class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2">
+                                <span v-if="processing" class="spinner-border spinner-border-sm"></span>
+                                <i v-else class="isax isax-shield-security"></i>
+                                {{ processing ? 'Saving details...' : `Continue to Payment — ${formatPrice(offer.price, offer.currency)}` }}
+                            </button>
+                        </div>
+                        <p class="text-center text-muted fs-12">
+                            <i class="isax isax-lock me-1"></i>Encrypted and secure. You won't be charged yet.
+                        </p>
+
+                    </template>
+
+                    <!-- ── STEP 2: Stripe Payment ──────────────────────── -->
+                    <template v-if="step === 'payment'">
+
+                        <div class="card payment-details mb-4">
+                            <div class="card-header">
+                                <h5>Payment Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Loading spinner -->
+                                <div v-if="!stripeReady"
+                                     class="d-flex align-items-center gap-2 text-muted py-4">
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                    Loading payment form...
+                                </div>
+                                <!-- Stripe Payment Element mounts here -->
+                                <div ref="paymentEl"></div>
+                                <p v-if="stripeError" class="mt-3 text-danger fw-medium">
+                                    <i class="isax isax-info-circle me-1"></i>{{ stripeError }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Pay button -->
+                        <div class="d-grid mb-2">
+                            <button @click="confirmPayment" :disabled="processing || !stripeReady"
+                                    class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2">
+                                <span v-if="processing" class="spinner-border spinner-border-sm"></span>
+                                <i v-else class="isax isax-lock"></i>
+                                {{ processing ? 'Processing payment...' : `Pay ${formatPrice(offer.price, offer.currency)}` }}
+                            </button>
+                        </div>
+                        <p class="text-center text-muted fs-12">
+                            <i class="isax isax-lock me-1"></i>Payments processed securely by Stripe.
+                        </p>
+                        <div class="text-center mt-2">
+                            <button @click="step = 'details'" class="btn btn-link btn-sm text-muted">
+                                ← Back to passenger details
+                            </button>
+                        </div>
+
+                    </template>
+                </div>
+
+                <!-- ── Right: Order summary ─────────────────────────────── -->
+                <div class="col-lg-4 theiaStickySidebar">
+                    <div class="card order-details">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between header-content">
+                                <h5>Review Order Details</h5>
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- Airline -->
+                            <div class="pb-3 border-bottom mb-3">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="border bg-light rounded p-2 flex-shrink-0"
+                                         style="width:52px;height:52px;display:flex;align-items:center;justify-content:center">
+                                        <img :src="airlineLogoUrl(offer.airline_iata)" :alt="offer.airline_name"
+                                             style="max-width:36px;max-height:36px;object-fit:contain"
+                                             @error="($event.target as HTMLImageElement).style.display='none'" />
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ offer.airline_name }}</h6>
+                                        <p class="fs-12 text-muted mb-0">
+                                            {{ offer.flight_number }} · {{ cabinLabel[offer.cabin_class] ?? offer.cabin_class }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Route timeline -->
+                                <div class="bg-light rounded p-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="text-center">
+                                            <h5 class="fw-bold mb-0">{{ formatTime(offer.departs_at) }}</h5>
+                                            <p class="fs-12 text-muted mb-0 fw-medium">{{ offer.origin }}</p>
+                                        </div>
+                                        <div class="flex-fill text-center px-2">
+                                            <p class="fs-11 text-muted mb-1">{{ parseDuration(offer.duration) }}</p>
+                                            <div class="position-relative">
+                                                <hr class="my-0">
+                                                <span class="position-absolute top-50 start-50 translate-middle bg-light px-1">
+                                                    <i class="isax isax-airplane rotate-45 text-primary" style="font-size:13px"></i>
+                                                </span>
+                                            </div>
+                                            <p class="fs-11 text-muted mt-1 mb-0">{{ offer.stop_label }}</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <h5 class="fw-bold mb-0">{{ formatTime(offer.arrives_at) }}</h5>
+                                            <p class="fs-12 text-muted mb-0 fw-medium">{{ offer.destination }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-center fs-11 text-muted mt-2 mb-0">{{ formatDate(offer.departs_at) }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Order info -->
+                            <div class="mt-3 pb-3 border-bottom">
+                                <h6 class="text-primary mb-3">Order Info</h6>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Departure</h6>
+                                    <p class="fs-14">{{ formatDate(offer.departs_at) }}</p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Duration</h6>
+                                    <p class="fs-14">{{ parseDuration(offer.duration) }}</p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Stops</h6>
+                                    <p class="fs-14">{{ offer.stop_label }}</p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Carry-on bag</h6>
+                                    <p class="fs-14" :class="offer.baggages.carry_on ? 'text-success' : 'text-muted'">
+                                        {{ offer.baggages.carry_on ? '✓ Included' : 'Not included' }}
+                                    </p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Checked bag</h6>
+                                    <p class="fs-14" :class="offer.baggages.checked ? 'text-success' : 'text-muted'">
+                                        {{ offer.baggages.checked ? '✓ Included' : 'Not included' }}
+                                    </p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Passengers</h6>
+                                    <p class="fs-14">{{ passengerCount }} Adult</p>
+                                </div>
+                                <div class="d-flex align-items-center details-info">
+                                    <h6 class="fs-14">Cabin Class</h6>
+                                    <p class="fs-14">{{ cabinLabel[offer.cabin_class] ?? offer.cabin_class }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Payment info -->
+                            <div class="mt-3 pb-3 border-bottom">
+                                <h6 class="text-primary mb-3">Payment Info</h6>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="fs-14">Total Fare</h6>
+                                    <p class="fs-14">{{ formatPrice(offer.price, offer.currency) }}</p>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <h6 class="fs-14 text-muted">Taxes & fees</h6>
+                                    <p class="fs-14 text-muted">Included</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mt-3">
+                                <h6 class="mb-0">Amount to Pay</h6>
+                                <h6 class="text-primary mb-0">{{ formatPrice(offer.price, offer.currency) }}</h6>
+                            </div>
+
+                            <!-- Trust badges -->
+                            <div class="mt-3 pt-3 border-top">
+                                <div class="d-flex flex-column gap-2 fs-12 text-muted">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="isax isax-shield-security text-primary"></i>
+                                        Secure 256-bit SSL encryption
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="isax isax-airplane text-primary"></i>
+                                        Instant booking confirmation
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="isax isax-sms text-primary"></i>
+                                        E-ticket sent to your email
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- /Page Wrapper -->
+
 </template>
