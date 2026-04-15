@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { ArrowUpDown, PlaneTakeoff, Hotel, Search, Users, ChevronDown, MapPin, Calendar, Star, Shield, Zap, Globe, Bell, Plane, CheckCircle } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
@@ -141,13 +140,6 @@ function searchHotels() {
 const todayStr = new Date().toISOString().split('T')[0];
 
 // ── Static content ────────────────────────────────────
-const STATS = [
-    { value: '1M+',  label: 'Happy Travellers' },
-    { value: '500+', label: 'Airlines Worldwide' },
-    { value: '200+', label: 'Destinations' },
-    { value: '4.8',  label: 'Average Rating', star: true },
-];
-
 const DESTINATIONS = [
     { city: 'Dubai',     country: 'UAE',          code: 'DXB', img: '/images/destination/destination-01.jpg' },
     { city: 'London',    country: 'United Kingdom', code: 'LHR', img: '/images/destination/destination-02.jpg' },
@@ -157,26 +149,13 @@ const DESTINATIONS = [
     { city: 'Lagos',     country: 'Nigeria',       code: 'LOS', img: '/images/destination/destination-06.jpg' },
 ];
 
-const FEATURES = [
-    { icon: Zap,    title: 'Lightning Fast Search',  desc: 'Live results from 500+ airlines in under 2 seconds. No waiting, no guessing.' },
-    { icon: Globe,  title: 'Global Coverage',        desc: '9,000+ airports worldwide — domestic routes, international connections, and everything in between.' },
-    { icon: Shield, title: 'Secure & Protected',     desc: 'PCI-DSS compliant checkout. Your payment data is encrypted end-to-end.' },
-    { icon: Bell,   title: 'Price Alerts',           desc: 'We watch your route 24/7 and notify you the moment prices drop.' },
-];
-
-const STEPS = [
-    { step: '01', icon: Search,   title: 'Search Flights',   desc: 'Enter your route, dates and number of passengers. We search hundreds of airlines instantly.' },
-    { step: '02', icon: Users,    title: 'Fill In Details',  desc: 'Enter passenger information securely. It only takes a couple of minutes.' },
-    { step: '03', icon: Plane,    title: 'Fly & Enjoy',      desc: 'Pay securely via Stripe. Your e-ticket lands in your inbox immediately.' },
-];
-
 const POPULAR_ROUTES = [
-    { from: 'LHR', fromCity: 'London',       to: 'DXB', toCity: 'Dubai',     price: 320 },
-    { from: 'LHR', fromCity: 'London',       to: 'JFK', toCity: 'New York',  price: 410 },
-    { from: 'LOS', fromCity: 'Lagos',        to: 'LHR', toCity: 'London',    price: 580 },
-    { from: 'NBO', fromCity: 'Nairobi',      to: 'DXB', toCity: 'Dubai',     price: 290 },
-    { from: 'ACC', fromCity: 'Accra',        to: 'CDG', toCity: 'Paris',     price: 490 },
-    { from: 'JNB', fromCity: 'Johannesburg', to: 'LHR', toCity: 'London',    price: 620 },
+    { from: 'LHR', fromCity: 'London',       to: 'DXB', toCity: 'Dubai',     price: 320, img: '/images/flight/flight-01.jpg' },
+    { from: 'LHR', fromCity: 'London',       to: 'JFK', toCity: 'New York',  price: 410, img: '/images/flight/flight-02.jpg' },
+    { from: 'LOS', fromCity: 'Lagos',        to: 'LHR', toCity: 'London',    price: 580, img: '/images/flight/flight-03.jpg' },
+    { from: 'NBO', fromCity: 'Nairobi',      to: 'DXB', toCity: 'Dubai',     price: 290, img: '/images/flight/flight-04.jpg' },
+    { from: 'ACC', fromCity: 'Accra',        to: 'CDG', toCity: 'Paris',     price: 490, img: '/images/flight/flight-05.jpg' },
+    { from: 'JNB', fromCity: 'Johannesburg', to: 'LHR', toCity: 'London',    price: 620, img: '/images/flight/flight-06.jpg' },
 ];
 
 const TESTIMONIALS = [
@@ -186,14 +165,40 @@ const TESTIMONIALS = [
         location: 'Lagos, Nigeria',
         rating: 5,
         img: '/images/users/user-01.jpg',
+        headline: 'Smooth Booking Experience!',
     },
     {
-        quote: "I've used a lot of booking platforms, but Obiala is by far the cleanest experience. Search is fast, the checkout is simple, and I love the price alerts.",
+        quote: "I've used a lot of booking platforms, but Obiala is by far the cleanest experience. Search is fast, checkout is simple, and I love the price alerts.",
         name: 'James K.',
         location: 'Nairobi, Kenya',
         rating: 5,
         img: '/images/users/user-28.jpg',
+        headline: 'Excellent Customer Service',
     },
+    {
+        quote: "Found a brilliant deal from Accra to Paris — saved over $120 compared to other sites. The whole process from search to e-ticket took less than 10 minutes.",
+        name: 'Kwame A.',
+        location: 'Accra, Ghana',
+        rating: 5,
+        img: '/images/users/user-22.jpg',
+        headline: 'Great Value & Fast Checkout',
+    },
+    {
+        quote: "Received my confirmation email almost immediately, and all the flight details were accurate. Will definitely use Obiala again for my next trip.",
+        name: 'Sarah M.',
+        location: 'London, United Kingdom',
+        rating: 5,
+        img: '/images/users/user-27.jpg',
+        headline: 'Instant Confirmation!',
+    },
+];
+
+const FAQS = [
+    { id: 'one',   q: 'How do I search for flights?',                     a: 'Enter your departure city, destination, travel dates and number of passengers, then click Search. We display live fares from 500+ airlines instantly.' },
+    { id: 'two',   q: 'Are the prices shown final with no hidden fees?',   a: 'Yes. The price you see at checkout is the full price — taxes and carrier fees included. We never add surprise charges at the last step.' },
+    { id: 'three', q: 'How quickly will I receive my e-ticket?',           a: 'Your e-ticket is emailed to you immediately after payment confirmation, usually within seconds.' },
+    { id: 'four',  q: 'Can I book for multiple passengers?',               a: 'Yes. You can add up to 9 adults per booking. Select the number of passengers in the search form before searching.' },
+    { id: 'five',  q: 'What is the cancellation or refund policy?',        a: 'Cancellation policies vary by airline and fare type. The specific conditions are displayed on the fare selection screen before you pay.' },
 ];
 
 function searchRoute(from: string, to: string) {
@@ -205,459 +210,577 @@ function searchRoute(from: string, to: string) {
     if (foundTo) destQuery.value = `${foundTo.city} (${foundTo.code})`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function cabinLabel(val: string) {
+    return val.charAt(0) + val.slice(1).toLowerCase().replace('_', ' ');
+}
 </script>
 
 <template>
     <Head title="Obiala Travel — Search & Book Flights" />
 
-    <!-- ══════════════════════════════════════════════════
-         HERO
-    ══════════════════════════════════════════════════ -->
-    <section class="relative min-h-[620px] overflow-hidden">
-        <!-- Background image + overlays -->
-        <div class="absolute inset-0">
-            <img src="/images/banner/banner-06.jpg" alt="Travel"
-                 class="h-full w-full object-cover object-center" />
-            <div class="absolute inset-0 bg-gradient-to-br from-[#0a1628]/90 via-[#0d2444]/80 to-[#1c3a6b]/70"></div>
-        </div>
-
-        <!-- Hero content -->
-        <div class="relative z-10 mx-auto max-w-7xl px-4 pt-24 pb-16 sm:px-6 lg:px-8">
-            <!-- Badge + headline -->
-            <div class="mb-8 text-center">
-                <span class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-200 backdrop-blur-sm">
-                    ✈ Powered by Duffel — Live Airline Data
-                </span>
-                <h1 class="mx-auto max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl"
-                   >
-                    Your Next Journey<br />
-                    <span class="text-blue-300">Starts Here.</span>
-                </h1>
-                <p class="mx-auto mt-4 max-w-xl text-base text-blue-100/80">
-                    Search live fares from 500+ airlines. Book in minutes. Fly with confidence.
-                </p>
-            </div>
-
-            <!-- Search card -->
-            <div class="mx-auto max-w-5xl rounded-2xl bg-white p-5 shadow-2xl">
-
-                <!-- Tabs -->
-                <div class="mb-5 flex gap-1 rounded-xl bg-gray-100 p-1 w-fit">
-                    <button @click="activeTab = 'flights'"
-                            :class="['flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold transition',
-                                     activeTab === 'flights' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
-                        <PlaneTakeoff class="h-4 w-4" /> Flights
-                    </button>
-                    <button @click="activeTab = 'hotels'"
-                            :class="['flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold transition',
-                                     activeTab === 'hotels' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700']">
-                        <Hotel class="h-4 w-4" /> Hotels
-                    </button>
+    <!-- Hero Section -->
+    <section class="hero-section-four">
+        <div class="container">
+            <div class="hero-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-10 col-md-12 mx-auto">
+                        <div class="banner-content text-center mx-auto">
+                            <h1 class="text-white display-4 mb-2">
+                                Discover the World, One
+                                <span class="flight-icon"><i class="fa-solid fa-plane-departure"></i></span>
+                                Flight at a Time with Obiala!
+                            </h1>
+                            <p class="text-white mx-auto">
+                                Search live fares from 500+ airlines. Book in minutes. Fly with confidence.
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+    <!-- /Hero Section -->
 
-                <!-- ── FLIGHT SEARCH ── -->
-                <div v-if="activeTab === 'flights'">
-                    <!-- Trip type -->
-                    <div class="mb-4 flex gap-4">
-                        <label v-for="t in [['one-way','One Way'],['round-trip','Round Trip'],['multi-city','Multi-City']]"
-                               :key="t[0]" class="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-600">
-                            <input type="radio" v-model="tripType" :value="t[0]"
-                                   class="accent-blue-600" />
-                            {{ t[1] }}
-                        </label>
-                    </div>
+    <!-- Banner Search -->
+    <section class="banner-search-four">
+        <div class="container">
+            <div class="banner-form card mb-0">
+                <div class="card-body">
 
-                    <!-- Search error -->
-                    <div v-if="searchError" class="mb-3 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600">
-                        {{ searchError }}
-                    </div>
+                    <!-- Tabs (Flights / Hotels) -->
+                    <ul class="nav nav-tabs nav-tabs-solid mb-3" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link d-flex align-items-center gap-1"
+                                    :class="{ active: activeTab === 'flights' }"
+                                    @click="activeTab = 'flights'">
+                                <i class="isax isax-airplane me-1"></i>Flights
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link d-flex align-items-center gap-1"
+                                    :class="{ active: activeTab === 'hotels' }"
+                                    @click="activeTab = 'hotels'">
+                                <i class="isax isax-building-3 me-1"></i>Hotels
+                            </button>
+                        </li>
+                    </ul>
 
-                    <!-- Inputs row -->
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr_1fr_1fr_auto]">
+                    <!-- ── FLIGHT SEARCH ── -->
+                    <div v-if="activeTab === 'flights'">
+                        <!-- Trip type -->
+                        <div class="d-flex align-items-center flex-wrap mb-3">
+                            <div class="form-check d-flex align-items-center me-3 mb-1">
+                                <input class="form-check-input mt-0" type="radio" v-model="tripType"
+                                       value="one-way" id="oneway">
+                                <label class="form-check-label fs-14 ms-2" for="oneway">One Way</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center me-3 mb-1">
+                                <input class="form-check-input mt-0" type="radio" v-model="tripType"
+                                       value="round-trip" id="roundtrip">
+                                <label class="form-check-label fs-14 ms-2" for="roundtrip">Round Trip</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center mb-1">
+                                <input class="form-check-input mt-0" type="radio" v-model="tripType"
+                                       value="multi-city" id="multicity">
+                                <label class="form-check-label fs-14 ms-2" for="multicity">Multi-City</label>
+                            </div>
+                        </div>
 
-                        <!-- Origin -->
-                        <div class="relative">
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">From</label>
-                            <div class="relative">
-                                <MapPin class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="originQuery"
+                        <!-- Search error -->
+                        <div v-if="searchError" class="alert alert-danger py-2 mb-3 fs-14">
+                            {{ searchError }}
+                        </div>
+
+                        <!-- Form row -->
+                        <div class="d-lg-flex">
+                        <div class="d-flex form-info">
+
+                            <!-- From -->
+                            <div class="form-item position-relative">
+                                <label class="form-label fs-14 text-default mb-1">From</label>
+                                <input v-model="originQuery" type="text" class="form-control"
+                                       placeholder="City or airport"
                                        @input="showOriginDrop = true; origin = ''"
                                        @focus="showOriginDrop = originQuery.length > 0"
-                                       @blur="setTimeout(() => showOriginDrop = false, 150)"
-                                       type="text" placeholder="City or airport"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                                       @blur="setTimeout(() => showOriginDrop = false, 150)">
+                                <p class="fs-12 mb-0 text-muted">
+                                    {{ origin ? (AIRPORTS.find(a => a.code === origin)?.name ?? '') : 'Enter departure city' }}
+                                </p>
                                 <ul v-if="showOriginDrop && filteredOrigin.length"
-                                    class="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+                                    class="dropdown-menu show w-100" style="z-index:1050">
                                     <li v-for="ap in filteredOrigin" :key="ap.code"
-                                        @mousedown="pickOrigin(ap)"
-                                        class="flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm hover:bg-blue-50">
-                                        <span class="font-medium text-gray-800">{{ ap.city }}</span>
-                                        <span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-500">{{ ap.code }}</span>
+                                        class="border-bottom" @mousedown="pickOrigin(ap)">
+                                        <a class="dropdown-item" href="#">
+                                            <h6 class="fs-15 fw-medium mb-0">{{ ap.city }}</h6>
+                                            <p class="mb-0 fs-12 text-muted">{{ ap.name }} ({{ ap.code }})</p>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
 
-                        <!-- Swap button -->
-                        <div class="flex items-end pb-0.5">
-                            <button @click="swapAirports"
-                                    class="flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 text-gray-400 transition hover:border-blue-400 hover:text-blue-500">
-                                <ArrowUpDown class="h-4 w-4" />
-                            </button>
-                        </div>
-
-                        <!-- Destination -->
-                        <div class="relative">
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">To</label>
-                            <div class="relative">
-                                <MapPin class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="destQuery"
+                            <!-- To (swap icon is a way-icon badge) -->
+                            <div class="form-item position-relative ps-2 ps-sm-3">
+                                <label class="form-label fs-14 text-default mb-1">To</label>
+                                <input v-model="destQuery" type="text" class="form-control"
+                                       placeholder="City or airport"
                                        @input="showDestDrop = true; destination = ''"
                                        @focus="showDestDrop = destQuery.length > 0"
-                                       @blur="setTimeout(() => showDestDrop = false, 150)"
-                                       type="text" placeholder="City or airport"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                                       @blur="setTimeout(() => showDestDrop = false, 150)">
+                                <p class="fs-12 mb-0 text-muted">
+                                    {{ destination ? (AIRPORTS.find(a => a.code === destination)?.name ?? '') : 'Enter destination city' }}
+                                </p>
+                                <button type="button" @click="swapAirports"
+                                        class="way-icon badge badge-primary rounded-pill translate-middle border-0"
+                                        title="Swap airports">
+                                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                                </button>
                                 <ul v-if="showDestDrop && filteredDest.length"
-                                    class="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl">
+                                    class="dropdown-menu show w-100" style="z-index:1050">
                                     <li v-for="ap in filteredDest" :key="ap.code"
-                                        @mousedown="pickDest(ap)"
-                                        class="flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm hover:bg-blue-50">
-                                        <span class="font-medium text-gray-800">{{ ap.city }}</span>
-                                        <span class="rounded bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-500">{{ ap.code }}</span>
+                                        class="border-bottom" @mousedown="pickDest(ap)">
+                                        <a class="dropdown-item" href="#">
+                                            <h6 class="fs-15 fw-medium mb-0">{{ ap.city }}</h6>
+                                            <p class="mb-0 fs-12 text-muted">{{ ap.name }} ({{ ap.code }})</p>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
 
-                        <!-- Depart date -->
-                        <div>
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">Depart</label>
-                            <div class="relative">
-                                <Calendar class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="departDate" type="date" :min="todayStr"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                            <!-- Departure -->
+                            <div class="form-item">
+                                <label class="form-label fs-14 text-default mb-1">Departure</label>
+                                <input v-model="departDate" type="date" :min="todayStr" class="form-control">
+                                <p class="fs-12 mb-0 text-muted">Select date</p>
                             </div>
-                        </div>
 
-                        <!-- Return date (round-trip only) -->
-                        <div>
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">Return</label>
-                            <div class="relative">
-                                <Calendar class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="returnDate" type="date" :min="departDate || todayStr"
+                            <!-- Return -->
+                            <div class="form-item">
+                                <label class="form-label fs-14 text-default mb-1">Return</label>
+                                <input v-model="returnDate" type="date"
+                                       :min="departDate || todayStr"
                                        :disabled="tripType !== 'round-trip'"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:text-gray-300" />
+                                       class="form-control">
+                                <p class="fs-12 mb-0 text-muted">Select date</p>
                             </div>
-                        </div>
 
-                        <!-- Search button -->
-                        <div class="flex items-end">
-                            <button @click="searchFlights"
-                                    class="flex h-11 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold text-white shadow-md transition hover:opacity-90 lg:w-auto"
-                                    style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                                <Search class="h-4 w-4" />
-                                <span>Search</span>
-                            </button>
-                        </div>
-                    </div>
+                            <!-- Travellers & Cabin dropdown -->
+                            <div class="form-item dropdown">
+                                <div data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                     role="menu" style="cursor:pointer">
+                                    <label class="form-label fs-14 text-default mb-1">Travellers &amp; Cabin</label>
+                                    <h5 class="mb-0">
+                                        {{ adults }}
+                                        <span class="fw-normal fs-14">{{ adults === 1 ? 'Person' : 'Persons' }}</span>
+                                    </h5>
+                                    <p class="fs-12 mb-0 text-muted">
+                                        {{ adults }} Adult{{ adults > 1 ? 's' : '' }}, {{ cabinLabel(cabinClass) }}
+                                    </p>
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-end p-3" style="min-width:280px">
+                                    <h6 class="mb-3">Travellers &amp; Class</h6>
+                                    <div class="mb-3">
+                                        <label class="form-label text-default mb-2">Adults</label>
+                                        <select v-model="adults" class="form-select form-select-sm">
+                                            <option v-for="n in 9" :key="n" :value="n">
+                                                {{ n }} Adult{{ n > 1 ? 's' : '' }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-default mb-2">Cabin Class</label>
+                                        <select v-model="cabinClass" class="form-select form-select-sm">
+                                            <option value="ECONOMY">Economy</option>
+                                            <option value="PREMIUM_ECONOMY">Premium Economy</option>
+                                            <option value="BUSINESS">Business</option>
+                                            <option value="FIRST">First Class</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label text-default mb-2">Currency</label>
+                                        <select v-model="currency" class="form-select form-select-sm">
+                                            <option value="USD">USD</option>
+                                            <option value="GBP">GBP</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="NGN">NGN</option>
+                                            <option value="GHS">GHS</option>
+                                            <option value="KES">KES</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Cabin / Passengers row -->
-                    <div class="mt-3 flex flex-wrap items-center gap-4 border-t border-gray-100 pt-3">
-                        <div class="flex items-center gap-2">
-                            <Users class="h-4 w-4 text-gray-400" />
-                            <label class="text-xs font-medium text-gray-500">Passengers</label>
-                            <select v-model="adults" class="rounded-lg border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400">
-                                <option v-for="n in 9" :key="n" :value="n">{{ n }} Adult{{ n > 1 ? 's' : '' }}</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <PlaneTakeoff class="h-4 w-4 text-gray-400" />
-                            <label class="text-xs font-medium text-gray-500">Cabin</label>
-                            <select v-model="cabinClass" class="rounded-lg border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400">
-                                <option value="ECONOMY">Economy</option>
-                                <option value="PREMIUM_ECONOMY">Premium Economy</option>
-                                <option value="BUSINESS">Business</option>
-                                <option value="FIRST">First Class</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-500">Currency</label>
-                            <select v-model="currency" class="rounded-lg border border-gray-200 px-2 py-1 text-sm outline-none focus:border-blue-400">
-                                <option value="USD">USD</option>
-                                <option value="GBP">GBP</option>
-                                <option value="EUR">EUR</option>
-                                <option value="NGN">NGN</option>
-                                <option value="GHS">GHS</option>
-                                <option value="KES">KES</option>
-                            </select>
-                        </div>
+                        </div><!-- /form-info -->
+                            <!-- Search button -->
+                            <div class="ms-lg-3 mt-3 mt-lg-0">
+                                <button @click="searchFlights" type="button"
+                                        class="btn btn-primary btn-lg d-flex align-items-center h-100">
+                                    <i class="isax isax-search-normal me-2"></i>Search
+                                </button>
+                            </div>
+                        </div><!-- /d-lg-flex -->
                     </div>
-                </div>
+                    <!-- /Flight search -->
 
-                <!-- ── HOTEL SEARCH ── -->
-                <div v-if="activeTab === 'hotels'">
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
-                        <div>
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">Destination</label>
-                            <div class="relative">
-                                <MapPin class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="hotelDest" type="text" placeholder="City, hotel or area"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                    <!-- ── HOTEL SEARCH ── -->
+                    <div v-if="activeTab === 'hotels'">
+                        <div class="d-lg-flex">
+                        <div class="d-flex form-info">
+
+                            <div class="form-item flex-fill">
+                                <label class="form-label fs-14 text-default mb-1">Destination</label>
+                                <input v-model="hotelDest" type="text" class="form-control"
+                                       placeholder="City, hotel or area">
+                                <p class="fs-12 mb-0 text-muted">Where are you going?</p>
                             </div>
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">Check-in</label>
-                            <div class="relative">
-                                <Calendar class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="hotelCheckin" type="date" :min="todayStr"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+
+                            <div class="form-item">
+                                <label class="form-label fs-14 text-default mb-1">Check-in</label>
+                                <input v-model="hotelCheckin" type="date" :min="todayStr" class="form-control">
+                                <p class="fs-12 mb-0 text-muted">Select date</p>
                             </div>
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-gray-400">Check-out</label>
-                            <div class="relative">
-                                <Calendar class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-400" />
-                                <input v-model="hotelCheckout" type="date" :min="hotelCheckin || todayStr"
-                                       class="w-full rounded-xl border border-gray-200 py-3 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+
+                            <div class="form-item">
+                                <label class="form-label fs-14 text-default mb-1">Check-out</label>
+                                <input v-model="hotelCheckout" type="date"
+                                       :min="hotelCheckin || todayStr" class="form-control">
+                                <p class="fs-12 mb-0 text-muted">Select date</p>
                             </div>
-                        </div>
-                        <div class="flex items-end">
-                            <button @click="searchHotels"
-                                    class="flex h-11 w-full items-center justify-center gap-2 rounded-xl px-6 text-sm font-bold text-white shadow-md transition hover:opacity-90"
-                                    style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                                <Search class="h-4 w-4" /> Search
-                            </button>
-                        </div>
+
+                            <div class="form-item dropdown">
+                                <div data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                     role="menu" style="cursor:pointer">
+                                    <label class="form-label fs-14 text-default mb-1">Guests</label>
+                                    <h5 class="mb-0">
+                                        {{ hotelGuests }}
+                                        <span class="fw-normal fs-14">{{ hotelGuests === 1 ? 'Guest' : 'Guests' }}</span>
+                                    </h5>
+                                    <p class="fs-12 mb-0 text-muted">1 Room</p>
+                                </div>
+                                <div class="dropdown-menu p-3" style="min-width:220px">
+                                    <label class="form-label text-default mb-2">Guests</label>
+                                    <select v-model="hotelGuests" class="form-select form-select-sm">
+                                        <option v-for="n in 10" :key="n" :value="n">
+                                            {{ n }} Guest{{ n > 1 ? 's' : '' }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div><!-- /form-info -->
+                            <div class="ms-lg-3 mt-3 mt-lg-0">
+                                <button @click="searchHotels" type="button"
+                                        class="btn btn-primary btn-lg d-flex align-items-center h-100">
+                                    <i class="isax isax-search-normal me-2"></i>Search
+                                </button>
+                            </div>
+                        </div><!-- /d-lg-flex -->
                     </div>
+                    <!-- /Hotel search -->
+
                 </div>
             </div>
         </div>
     </section>
+    <!-- /Banner Search -->
 
-    <!-- ══════════════════════════════════════════════════
-         STATS BAR
-    ══════════════════════════════════════════════════ -->
-    <section class="border-b border-gray-100 bg-white py-8 shadow-sm">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 gap-6 sm:grid-cols-4">
-                <div v-for="stat in STATS" :key="stat.label" class="text-center">
-                    <div class="flex items-center justify-center gap-1">
-                        <p class="text-3xl font-extrabold text-gray-900">
-                            {{ stat.value }}
+    <!-- Destination Section -->
+    <section class="section destination-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-5 col-lg-10 text-center">
+                    <div class="section-header section-header-four text-center">
+                        <h2 class="mb-2"><span>Popular</span> Locations</h2>
+                        <p class="sub-title">
+                            Top destinations our travellers love — click any city to search flights instantly.
                         </p>
-                        <Star v-if="stat.star" class="h-5 w-5 fill-amber-400 text-amber-400" />
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">{{ stat.label }}</p>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- ══════════════════════════════════════════════════
-         POPULAR DESTINATIONS
-    ══════════════════════════════════════════════════ -->
-    <section class="py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <!-- Section header -->
-            <div class="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-                <div>
-                    <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-                        Featured Destinations
-                    </span>
-                    <h2 class="text-3xl font-extrabold text-gray-900">
-                        Popular Destinations<span class="text-blue-600">.</span>
-                    </h2>
-                </div>
-                <p class="text-sm text-gray-400">Click any city to search flights instantly</p>
-            </div>
-
-            <!-- Destination grid -->
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div class="row justify-content-center g-4">
                 <div v-for="dest in DESTINATIONS" :key="dest.code"
+                     class="col-lg-4 col-sm-6"
                      @click="searchRoute('LHR', dest.code)"
-                     class="group relative cursor-pointer overflow-hidden rounded-2xl">
-                    <img :src="dest.img" :alt="dest.city"
-                         class="h-52 w-full object-cover transition duration-500 group-hover:scale-110" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    <div class="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 class="text-base font-bold text-white">{{ dest.city }}</h3>
-                        <p class="text-xs text-white/70">{{ dest.country }}</p>
-                    </div>
-                    <!-- Hover overlay -->
-                    <div class="absolute inset-0 flex items-center justify-center bg-blue-600/0 transition duration-300 group-hover:bg-blue-600/20">
-                        <span class="translate-y-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-blue-600 opacity-0 shadow-lg transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                            Search Flights →
-                        </span>
+                     style="cursor:pointer">
+                    <div class="location-wrap">
+                        <img :src="dest.img" :alt="dest.city">
+                        <span class="loc-name bg-white">{{ dest.city }}</span>
+                        <a @click.prevent="searchRoute('LHR', dest.code)"
+                           href="#" class="loc-view">
+                            <i class="isax isax-arrow-right-1"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <!-- /Destination Section -->
 
-    <!-- ══════════════════════════════════════════════════
-         WHY CHOOSE OBIALA
-    ══════════════════════════════════════════════════ -->
-    <section class="bg-gray-50 py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <!-- Section header -->
-            <div class="mb-12 text-center">
-                <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-                    Why Obiala
-                </span>
-                <h2 class="text-3xl font-extrabold text-gray-900">
-                    Built for Travellers Who Mean Business<span class="text-blue-600">.</span>
-                </h2>
-                <p class="mx-auto mt-3 max-w-xl text-sm text-gray-500">
-                    We cut out the noise — no paid placements, no hidden fees. Just fast, honest flight search.
-                </p>
-            </div>
-
-            <!-- Feature cards -->
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div v-for="feat in FEATURES" :key="feat.title"
-                     class="group rounded-2xl bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
-                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
-                        <component :is="feat.icon" class="h-5 w-5" />
+    <!-- Place Section (Popular Routes) -->
+    <section class="section place-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-10 text-center">
+                    <div class="section-header section-header-four mb-4 text-center">
+                        <h2 class="mb-2"><span>Popular</span> Flight Routes.</h2>
+                        <p class="sub-title">
+                            Live-priced routes our travellers book most. Click any card to search instantly.
+                        </p>
                     </div>
-                    <h3 class="mb-2 font-bold text-gray-900">{{ feat.title }}</h3>
-                    <p class="text-sm leading-relaxed text-gray-500">{{ feat.desc }}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         HOW IT WORKS
-    ══════════════════════════════════════════════════ -->
-    <section class="py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 text-center">
-                <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-                    Simple Process
-                </span>
-                <h2 class="text-3xl font-extrabold text-gray-900">
-                    Book a Flight in 3 Easy Steps<span class="text-blue-600">.</span>
-                </h2>
-            </div>
-
-            <div class="relative grid gap-8 sm:grid-cols-3">
-                <!-- Connecting line (desktop) -->
-                <div class="absolute top-8 left-1/6 right-1/6 hidden h-px bg-blue-100 sm:block"></div>
-
-                <div v-for="step in STEPS" :key="step.step" class="relative text-center">
-                    <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-200">
-                        <component :is="step.icon" class="h-6 w-6 text-white" />
-                    </div>
-                    <span class="mb-1 block text-xs font-bold uppercase tracking-widest text-blue-400">Step {{ step.step }}</span>
-                    <h3 class="mb-2 text-lg font-bold text-gray-900">{{ step.title }}</h3>
-                    <p class="mx-auto max-w-xs text-sm text-gray-500">{{ step.desc }}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         POPULAR ROUTES
-    ══════════════════════════════════════════════════ -->
-    <section class="bg-gray-50 py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-                <div>
-                    <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-                        Top Routes
-                    </span>
-                    <h2 class="text-3xl font-extrabold text-gray-900">
-                        Popular Flight Routes<span class="text-blue-600">.</span>
-                    </h2>
                 </div>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="row g-4">
                 <div v-for="route in POPULAR_ROUTES" :key="`${route.from}-${route.to}`"
-                     @click="searchRoute(route.from, route.to)"
-                     class="group flex cursor-pointer items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 transition duration-200 hover:border-blue-300 hover:shadow-md">
-                    <div class="flex items-center gap-4">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
-                            <Plane class="h-5 w-5" />
+                     class="col-lg-4 col-md-6">
+                    <div class="place-item mb-0" style="cursor:pointer"
+                         @click="searchRoute(route.from, route.to)">
+                        <div class="place-img">
+                            <img :src="route.img" class="img-fluid" :alt="`${route.fromCity} to ${route.toCity}`">
+                            <div class="fav-item">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-indigo">Popular</span>
+                                </div>
+                                <span class="badge badge-warning badge-xs text-gray-9 fs-13 fw-medium rounded">
+                                    <i class="ti ti-star-filled me-1"></i>4.8
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-gray-900">{{ route.fromCity }} → {{ route.toCity }}</p>
-                            <p class="text-xs text-gray-400">{{ route.from }} – {{ route.to }} · Economy</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-lg font-extrabold text-blue-600">from ${{ route.price }}</p>
-                        <p class="text-xs text-gray-400">one way</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ══════════════════════════════════════════════════
-         TESTIMONIALS
-    ══════════════════════════════════════════════════ -->
-    <section class="py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 text-center">
-                <span class="mb-2 inline-block rounded-full bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-                    Testimonials
-                </span>
-                <h2 class="text-3xl font-extrabold text-gray-900">
-                    What Our Travellers Say<span class="text-blue-600">.</span>
-                </h2>
-            </div>
-
-            <div class="grid gap-6 sm:grid-cols-2">
-                <div v-for="t in TESTIMONIALS" :key="t.name"
-                     class="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
-                    <!-- Stars -->
-                    <div class="mb-4 flex gap-1">
-                        <Star v-for="i in t.rating" :key="i" class="h-4 w-4 fill-amber-400 text-amber-400" />
-                    </div>
-                    <p class="mb-6 text-base leading-relaxed text-gray-600">"{{ t.quote }}"</p>
-                    <div class="flex items-center gap-3">
-                        <img :src="t.img" :alt="t.name"
-                             class="h-12 w-12 rounded-full object-cover ring-2 ring-blue-100" />
-                        <div>
-                            <p class="font-bold text-gray-900">{{ t.name }}</p>
-                            <p class="text-xs text-gray-400">{{ t.location }}</p>
+                        <div class="place-content">
+                            <div class="flight-loc d-flex align-items-center justify-content-between mb-2">
+                                <span class="loc-name d-inline-flex align-items-center">
+                                    <i class="isax isax-airplane rotate-45 me-2"></i>{{ route.fromCity }}
+                                </span>
+                                <span class="arrow-icon"><i class="isax isax-arrow-2"></i></span>
+                                <span class="loc-name d-inline-flex align-items-center">
+                                    <i class="isax isax-airplane rotate-135 me-2"></i>{{ route.toCity }}
+                                </span>
+                            </div>
+                            <h5 class="text-truncate mb-1">
+                                {{ route.from }} – {{ route.to }} · Economy
+                            </h5>
+                            <div class="d-flex align-items-center justify-content-between border-top pt-3">
+                                <h6 class="text-primary mb-0">
+                                    <span class="fs-14 fw-normal text-default">From </span>
+                                    ${{ route.price }}
+                                </h6>
+                                <span class="badge bg-outline-success fs-10 fw-medium">One Way</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <!-- /Place Section -->
 
-    <!-- ══════════════════════════════════════════════════
-         CTA
-    ══════════════════════════════════════════════════ -->
-    <section class="relative overflow-hidden py-20">
-        <div class="absolute inset-0" style="background:linear-gradient(135deg,#0a1628,#1c3a6b)"></div>
-        <!-- Decorative circles -->
-        <div class="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-blue-500/10"></div>
-        <div class="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-400/10"></div>
-
-        <div class="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
-            <span class="mb-3 inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-300">
-                Get Started Today
-            </span>
-            <h2 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl">
-                Ready to Explore the World?
-            </h2>
-            <p class="mb-8 text-base text-blue-200/80">
-                Join over 1 million travellers who book smarter with Obiala. Free to sign up — no subscription required.
-            </p>
-            <div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                <a href="/register"
-                   class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-blue-700 shadow-lg transition hover:bg-blue-50">
-                    Create Free Account →
-                </a>
-                <a href="/flights/search?origin=LHR&destination=DXB&depart=&adults=1&cabin=ECONOMY&currency=USD&trip_type=one-way"
-                   class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10">
-                    <Search class="h-4 w-4" /> Search Flights
-                </a>
+    <!-- About Section -->
+    <section class="section about-section-four bg-light-200">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="section-header section-header-four mb-4">
+                        <h2 class="mb-2">
+                            <span>Where speed</span> meets simplicity — booking flights made effortless.
+                        </h2>
+                        <p class="sub-title">
+                            Our mission is to give every traveller access to the best fares in seconds.
+                            No hidden fees, no confusion — just fast, honest flight search powered by live airline data.
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <h6 class="display-6">500+</h6>
+                                <p>Airlines Worldwide</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <h6 class="display-6">200+</h6>
+                                <p>Destinations Covered</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <h6 class="display-6">1M+</h6>
+                                <p>Happy Travellers</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <h6 class="display-6">4.8<span class="fs-14 fw-normal">/5.0</span></h6>
+                                <p>Average Rating</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center flex-wrap gap-3 mb-0 mb-md-4 mb-lg-0">
+                        <a href="/register"
+                           class="btn btn-dark d-inline-flex align-items-center">
+                            <i class="isax isax-add-circle5 me-2"></i>Create Free Account
+                        </a>
+                        <a href="/flights/search"
+                           class="btn btn-primary d-inline-flex align-items-center">
+                            <i class="isax isax-search-normal me-2"></i>Search Flights
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-7 d-flex ps-lg-0">
+                    <div class="flight-about d-lg-flex align-items-center flex-fill">
+                        <img src="/images/about/about-flights.svg" alt="About Obiala Travel">
+                    </div>
+                </div>
             </div>
         </div>
     </section>
+    <!-- /About Section -->
+
+    <!-- Support Ticker Section -->
+    <section class="support-section bg-dark support-section-five">
+        <div class="horizontal-slide d-flex" data-direction="left" data-speed="slow">
+            <div class="slide-list d-flex">
+                <div class="support-item"><h5>Personalized Itineraries</h5></div>
+                <div class="support-item"><h5>500+ Airlines</h5></div>
+                <div class="support-item"><h5>Instant E-Tickets</h5></div>
+                <div class="support-item"><h5>Secure Checkout</h5></div>
+                <div class="support-item"><h5>Price Alerts</h5></div>
+                <div class="support-item"><h5>24/7 Support</h5></div>
+                <div class="support-item"><h5>Multiple Currencies</h5></div>
+                <div class="support-item"><h5>Live Fare Data</h5></div>
+            </div>
+        </div>
+    </section>
+    <!-- /Support Ticker -->
+
+    <!-- Testimonial Section -->
+    <section class="section testimonial-section z-1 bg-light-200">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="flex-fill position-relative">
+                        <div class="mb-4 mb-lg-0 success-wrap">
+                            <div class="section-header section-header-four">
+                                <h2 class="mb-2"><span>Success</span> stories in their own words</h2>
+                                <p class="sub-title">
+                                    Read what our satisfied travellers have to say about booking with Obiala.
+                                </p>
+                            </div>
+                            <h6 class="fw-medium mb-1">Trusted by 1M+ customers</h6>
+                            <div class="d-flex align-items-center fs-14">
+                                <i class="ti ti-star-filled text-primary me-1"></i>
+                                <i class="ti ti-star-filled text-primary me-1"></i>
+                                <i class="ti ti-star-filled text-primary me-1"></i>
+                                <i class="ti ti-star-filled text-primary me-1"></i>
+                                <i class="ti ti-star-filled text-primary me-2"></i>
+                                <p class="fs-14">
+                                    <span class="text-gray-9">4.8/5.0</span> (From 12,400+ Reviews)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="testimonial-success">
+                        <div class="row g-4">
+                            <div v-for="t in TESTIMONIALS" :key="t.name" class="col-md-6 d-flex">
+                                <div class="card flex-fill mb-0">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <a href="#" class="avatar avatar-lg flex-shrink-0">
+                                                <img :src="t.img" class="rounded-circle" :alt="t.name">
+                                            </a>
+                                            <div class="ms-2">
+                                                <h6 class="fs-16 fw-medium">{{ t.name }}</h6>
+                                                <p>{{ t.location }}</p>
+                                            </div>
+                                        </div>
+                                        <h6 class="mb-2">{{ t.headline }}</h6>
+                                        <p class="mb-2">{{ t.quote }}</p>
+                                        <div class="d-flex align-items-center">
+                                            <i v-for="i in t.rating" :key="i"
+                                               class="ti ti-star-filled text-primary me-1"></i>
+                                            <p class="mb-0">{{ t.rating }}.0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /Testimonial Section -->
+
+    <!-- FAQ Section -->
+    <section class="faq-section-four section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-12 text-center">
+                    <div class="section-header section-header-four text-center">
+                        <h2 class="mb-2"><span>Frequently</span> Asked Questions</h2>
+                        <p class="sub-title">
+                            Everything you need to know about booking flights with Obiala.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="accordion accordion-flush faq-four" id="accordionFaq">
+                        <div v-for="(faq, idx) in FAQS" :key="faq.id"
+                             :class="['accordion-item mb-2', idx === 0 ? 'show' : '']">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" :class="{ collapsed: idx !== 0 }"
+                                        type="button" data-bs-toggle="collapse"
+                                        :data-bs-target="`#faq-${faq.id}`"
+                                        :aria-expanded="idx === 0 ? 'true' : 'false'">
+                                    {{ faq.q }}
+                                </button>
+                            </h2>
+                            <div :id="`faq-${faq.id}`"
+                                 class="accordion-collapse collapse"
+                                 :class="{ show: idx === 0 }"
+                                 data-bs-parent="#accordionFaq">
+                                <div class="accordion-body">
+                                    <p class="mb-0">{{ faq.a }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA inside FAQ -->
+                    <div class="business-wrap bg-dark mt-4">
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="business-info">
+                                    <h2 class="display-6 text-white mb-3">
+                                        Ready to find your next flight?
+                                    </h2>
+                                    <p class="text-light mb-4">
+                                        Join over 1 million travellers who book smarter with Obiala.
+                                        Free to sign up — no subscription required.
+                                    </p>
+                                    <a href="/register"
+                                       class="btn btn-primary d-inline-flex align-items-center">
+                                        <i class="isax isax-add-circle me-2"></i>Create Free Account
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-lg-5 d-flex align-items-center justify-content-end">
+                                <div class="business-img">
+                                    <img src="/images/about/about-flights.svg" alt="img">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /FAQ Section -->
+
 </template>

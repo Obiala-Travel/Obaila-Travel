@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CheckCircle, PlaneTakeoff, User, Mail, ArrowRight, Home } from 'lucide-vue-next';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
 defineOptions({ layout: GuestLayout });
@@ -55,7 +54,7 @@ interface Booking {
     contact: Contact
 }
 
-const props = defineProps<{ booking: Booking }>();
+defineProps<{ booking: Booking }>();
 
 function formatTime(iso: string) {
     if (!iso) return '--:--';
@@ -88,170 +87,233 @@ const cabinLabel: Record<string, string> = {
 <template>
     <Head :title="`Booking Confirmed — ${booking.reference} — Obiala`" />
 
-    <!-- ── Success hero band ─────────────────────────────────────────────── -->
-    <div class="border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50">
-        <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-            <div class="flex flex-col items-center text-center">
-                <!-- Animated checkmark ring -->
-                <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 shadow-md shadow-emerald-100">
-                    <CheckCircle class="h-11 w-11 text-emerald-600" />
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-900">Booking confirmed!</h1>
-                <p class="mt-2 text-base text-gray-500">
-                    Your e-ticket has been sent to
-                    <strong class="text-gray-700">{{ booking.contact?.email }}</strong>
-                </p>
-                <!-- Reference pill -->
-                <div class="mt-4 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-5 py-2.5 shadow-sm">
-                    <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Booking ref</span>
-                    <span class="font-mono text-lg font-bold tracking-widest text-gray-900">{{ booking.reference }}</span>
-                    <span :class="[
-                        'ml-2 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide',
-                        booking.status === 'confirmed'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-amber-100 text-amber-700'
-                    ]">
-                        {{ booking.status === 'confirmed' ? 'Confirmed' : 'Pending' }}
-                    </span>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar breadcrumb-bg-05 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="breadcrumb-title mb-2">Flight Booking Confirmation</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center mb-0">
+                            <li class="breadcrumb-item"><a href="/"><i class="isax isax-home5"></i></a></li>
+                            <li class="breadcrumb-item">Flights</li>
+                            <li class="breadcrumb-item active">Booking Confirmed</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
+    <!-- /Breadcrumb -->
 
-    <!-- ── Page body ─────────────────────────────────────────────────────── -->
-    <div class="bg-gray-50 min-h-screen">
-        <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 space-y-4">
+    <!-- Page Wrapper -->
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
 
-            <!-- ── Flight summary card ─────────────────────────────────── -->
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <!-- Card header -->
-                <div class="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
-                        <PlaneTakeoff class="h-4 w-4 text-blue-600" />
-                    </div>
-                    <h2 class="text-sm font-bold text-gray-900">Flight details</h2>
-                </div>
-
-                <div class="px-5 py-5">
-                    <!-- Airline row -->
-                    <div class="mb-4 flex items-center gap-3">
-                        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 shadow-sm">
-                            <img :src="airlineLogoUrl(booking.offer?.airline_iata ?? '')"
-                                 :alt="booking.offer?.airline_name"
-                                 class="h-full w-full object-contain p-1.5"
-                                 @error="($event.target as HTMLImageElement).style.display='none'" />
-                        </div>
+                    <!-- Success alert -->
+                    <div class="alert alert-success d-flex align-items-center gap-3 mb-4 p-4">
+                        <span class="avatar avatar-md bg-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                            <i class="isax isax-tick-circle text-white fs-20"></i>
+                        </span>
                         <div>
-                            <p class="text-sm font-semibold text-gray-900">{{ booking.offer?.airline_name }}</p>
-                            <p class="text-xs text-gray-400">{{ booking.offer?.flight_number }} · {{ cabinLabel[booking.cabin_class] ?? booking.cabin_class }}</p>
+                            <h5 class="mb-1">Booking Confirmed!</h5>
+                            <p class="mb-0 fs-14">
+                                Your e-ticket has been sent to
+                                <strong>{{ booking.contact?.email }}</strong>
+                            </p>
                         </div>
-                        <div class="ml-auto flex flex-wrap gap-2">
-                            <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                                {{ booking.passengers }} passenger{{ booking.passengers > 1 ? 's' : '' }}
+                        <div class="ms-auto text-end">
+                            <p class="fs-12 text-muted mb-1">Booking Reference</p>
+                            <h6 class="font-monospace mb-0">{{ booking.reference }}</h6>
+                            <span :class="['badge rounded-pill mt-1', booking.status === 'confirmed' ? 'badge-info' : 'badge-warning text-dark']">
+                                {{ booking.status === 'confirmed' ? 'Confirmed' : 'Pending' }}
                             </span>
                         </div>
                     </div>
 
-                    <!-- Route timeline -->
-                    <div class="rounded-xl bg-gray-50 p-4">
-                        <div class="flex items-center justify-between gap-4">
-                            <div class="text-center">
-                                <p class="text-2xl font-extrabold leading-none text-gray-900">{{ formatTime(booking.offer?.departs_at) }}</p>
-                                <p class="mt-1 text-sm font-bold text-gray-600">{{ booking.offer?.origin }}</p>
-                                <p class="text-xs text-gray-400">{{ booking.offer?.origin_name }}</p>
-                            </div>
-                            <div class="flex min-w-0 flex-1 flex-col items-center gap-1 px-2">
-                                <span class="text-[11px] font-medium text-gray-400">{{ parseDuration(booking.offer?.duration) }}</span>
-                                <div class="relative flex w-full items-center">
-                                    <div class="h-px flex-1 bg-gray-300"></div>
-                                    <PlaneTakeoff class="mx-1.5 h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
-                                    <div class="h-px flex-1 bg-gray-300"></div>
+                    <!-- Main confirmation card -->
+                    <div class="card booking-confirmation mb-4">
+                        <div class="card-body">
+
+                            <!-- Booking header: airline + status -->
+                            <div class="bg-light-200 border border-light p-3 rounded-2 mb-4">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between">
+                                    <div class="d-flex flex-wrap align-items-center booking-hotels">
+                                        <div class="avatar avatar-lg me-2 border bg-white rounded-circle overflow-hidden p-1">
+                                            <img :src="airlineLogoUrl(booking.offer?.airline_iata ?? '')"
+                                                 :alt="booking.offer?.airline_name"
+                                                 class="img-fluid rounded-circle"
+                                                 style="object-fit:contain"
+                                                 @error="($event.target as HTMLImageElement).style.display='none'" />
+                                        </div>
+                                        <div class="booking-details">
+                                            <h6 class="mb-1">{{ booking.offer?.airline_name }}</h6>
+                                            <div class="d-flex flex-wrap align-items-center booking-items">
+                                                <p class="fs-14 text-gray-6 pe-2 border-end border-light d-flex align-items-center me-2">
+                                                    <i class="isax isax-ticket me-1"></i>
+                                                    {{ booking.offer?.flight_number }}
+                                                </p>
+                                                <p class="fs-14 text-gray-6 pe-2 border-end border-light d-flex align-items-center me-2">
+                                                    <i class="isax isax-airplane me-1"></i>
+                                                    {{ cabinLabel[booking.cabin_class] ?? booking.cabin_class }}
+                                                </p>
+                                                <p class="fs-14 text-gray-6 d-flex align-items-center">
+                                                    <i class="isax isax-people me-1"></i>
+                                                    {{ booking.passengers }} passenger{{ booking.passengers > 1 ? 's' : '' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span :class="['badge status rounded-pill p-2 fs-10 d-flex align-items-center', booking.status === 'confirmed' ? 'badge-info' : 'badge-warning text-dark']">
+                                            {{ booking.status === 'confirmed' ? 'Confirmed' : 'Pending' }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="text-[11px] text-gray-400">{{ booking.offer?.stop_label }}</span>
                             </div>
-                            <div class="text-center">
-                                <p class="text-2xl font-extrabold leading-none text-gray-900">{{ formatTime(booking.offer?.arrives_at) }}</p>
-                                <p class="mt-1 text-sm font-bold text-gray-600">{{ booking.offer?.destination }}</p>
-                                <p class="text-xs text-gray-400">{{ booking.offer?.destination_name }}</p>
+
+                            <!-- Booking Info grid -->
+                            <div class="pb-4 border-bottom mb-4">
+                                <h6 class="mb-3">Booking Info</h6>
+                                <div class="row g-3">
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">From</h6>
+                                        <p class="text-gray-6 fs-16">{{ booking.offer?.origin }} <span class="text-muted fs-12">({{ booking.offer?.origin_name }})</span></p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">To</h6>
+                                        <p class="text-gray-6 fs-16">{{ booking.offer?.destination }} <span class="text-muted fs-12">({{ booking.offer?.destination_name }})</span></p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Departure</h6>
+                                        <p class="text-gray-6 fs-16">{{ formatDate(booking.offer?.departs_at) }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Departure Time</h6>
+                                        <p class="text-gray-6 fs-16">{{ formatTime(booking.offer?.departs_at) }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Arrival Time</h6>
+                                        <p class="text-gray-6 fs-16">{{ formatTime(booking.offer?.arrives_at) }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Duration</h6>
+                                        <p class="text-gray-6 fs-16">{{ parseDuration(booking.offer?.duration) }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Stops</h6>
+                                        <p class="text-gray-6 fs-16">{{ booking.offer?.stop_label }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Trip Type</h6>
+                                        <p class="text-gray-6 fs-16 text-capitalize">{{ booking.type ?? 'One way' }}</p>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Passenger Info -->
+                            <div class="pb-4 border-bottom mb-4">
+                                <h6 class="mb-3">Passenger{{ booking.pax?.length > 1 ? 's' : '' }}</h6>
+                                <div class="row g-3">
+                                    <div v-for="(pax, i) in booking.pax" :key="i" class="col-lg-6">
+                                        <div class="d-flex align-items-center gap-2 p-3 bg-light-200 rounded-2">
+                                            <span class="avatar avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                                                <i class="isax isax-user text-white fs-14"></i>
+                                            </span>
+                                            <div>
+                                                <p class="fs-14 fw-medium mb-0 text-capitalize">
+                                                    {{ pax.title }}. {{ pax.first_name }} {{ pax.last_name }}
+                                                    <span class="badge bg-primary ms-1 fs-10">Adult</span>
+                                                </p>
+                                                <p class="fs-12 text-muted mb-0">
+                                                    Passport: {{ pax.passport_number }} · Exp: {{ pax.passport_expiry }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Billing Info -->
+                            <div class="pb-4 border-bottom mb-4">
+                                <h6 class="mb-3">Billing Info</h6>
+                                <div class="row g-3">
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Email</h6>
+                                        <p class="text-gray-6 fs-16">{{ booking.contact?.email }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Phone</h6>
+                                        <p class="text-gray-6 fs-16">{{ booking.contact?.phone }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Info -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">Order Info</h6>
+                                <div class="row g-3">
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Booking Reference</h6>
+                                        <p class="text-primary fs-16 font-monospace">#{{ booking.reference }}</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Payment Method</h6>
+                                        <p class="text-gray-6 fs-16">Stripe</p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Payment Status</h6>
+                                        <p :class="['fs-16', booking.status === 'confirmed' ? 'text-success' : 'text-warning']">
+                                            {{ booking.status === 'confirmed' ? 'Paid' : 'Pending' }}
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <h6 class="fs-14">Total Paid</h6>
+                                        <p class="text-primary fw-bold fs-16">{{ formatPrice(booking.total_price, booking.currency) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- What's next -->
+                            <div class="bg-light-200 rounded-2 p-4 mb-4">
+                                <h6 class="mb-3">
+                                    <i class="isax isax-info-circle text-primary me-2"></i>What happens next?
+                                </h6>
+                                <ol class="d-flex flex-column gap-2 ps-0 mb-0" style="list-style:none">
+                                    <li v-for="(step, i) in [
+                                        'Check your inbox — a booking summary has been sent to your email.',
+                                        'Payment is processed securely. Your e-ticket will be issued once payment clears.',
+                                        'Check in online with the airline 24–48 hours before departure.',
+                                    ]" :key="i" class="d-flex align-items-start gap-2">
+                                        <span class="avatar avatar-xs bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fs-12 text-white fw-bold">
+                                            {{ i + 1 }}
+                                        </span>
+                                        <p class="fs-14 mb-0">{{ step }}</p>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="d-flex flex-wrap justify-content-center gap-3">
+                                <Link href="/"
+                                      class="btn btn-light d-inline-flex align-items-center gap-2">
+                                    <i class="isax isax-home5"></i>Search more flights
+                                </Link>
+                                <Link href="/bookings"
+                                      class="btn btn-primary d-inline-flex align-items-center gap-2">
+                                    View my bookings<i class="isax isax-arrow-right-1"></i>
+                                </Link>
+                            </div>
+
                         </div>
-                        <p class="mt-3 text-center text-xs text-gray-400">{{ formatDate(booking.offer?.departs_at) }}</p>
                     </div>
+
                 </div>
             </div>
-
-            <!-- ── Passengers card ────────────────────────────────────── -->
-            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div class="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
-                        <User class="h-4 w-4 text-blue-600" />
-                    </div>
-                    <h2 class="text-sm font-bold text-gray-900">Passenger{{ booking.pax?.length > 1 ? 's' : '' }}</h2>
-                </div>
-                <div class="divide-y divide-gray-100">
-                    <div v-for="(pax, i) in booking.pax" :key="i" class="flex items-center justify-between px-5 py-3.5">
-                        <div>
-                            <p class="text-sm font-semibold capitalize text-gray-900">
-                                {{ pax.title }}. {{ pax.first_name }} {{ pax.last_name }}
-                            </p>
-                            <p class="mt-0.5 text-xs text-gray-400">Passport: {{ pax.passport_number }} · Expires: {{ pax.passport_expiry }}</p>
-                        </div>
-                        <span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">Adult</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Contact + Total row ────────────────────────────────── -->
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <div class="mb-3 flex items-center gap-2">
-                        <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
-                            <Mail class="h-4 w-4 text-blue-600" />
-                        </div>
-                        <h3 class="text-sm font-bold text-gray-900">Contact</h3>
-                    </div>
-                    <p class="text-sm text-gray-600">{{ booking.contact?.email }}</p>
-                    <p class="text-sm text-gray-600">{{ booking.contact?.phone }}</p>
-                </div>
-                <div class="flex flex-col justify-center rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Total paid</p>
-                    <p class="mt-1 text-3xl font-extrabold text-gray-900">
-                        {{ formatPrice(booking.total_price, booking.currency) }}
-                    </p>
-                    <p class="mt-0.5 text-xs text-gray-400">All taxes and fees included</p>
-                </div>
-            </div>
-
-            <!-- ── What's next ────────────────────────────────────────── -->
-            <div class="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 shadow-sm">
-                <h3 class="mb-4 text-sm font-bold text-blue-900">What happens next?</h3>
-                <ol class="flex flex-col gap-3">
-                    <li v-for="(step, i) in [
-                        'Check your inbox — a booking summary has been sent to your email.',
-                        'Payment is processed securely. Your e-ticket will be issued once payment clears.',
-                        'Check in online with the airline 24–48 hours before departure.',
-                    ]" :key="i" class="flex items-start gap-3">
-                        <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white">
-                            {{ i + 1 }}
-                        </span>
-                        <p class="text-sm text-blue-800">{{ step }}</p>
-                    </li>
-                </ol>
-            </div>
-
-            <!-- ── Actions ────────────────────────────────────────────── -->
-            <div class="flex flex-wrap justify-center gap-3 pb-4">
-                <Link href="/"
-                      class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
-                    <Home class="h-4 w-4" /> Search more flights
-                </Link>
-                <Link href="/bookings"
-                      class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
-                      style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                    View my bookings <ArrowRight class="h-4 w-4" />
-                </Link>
-            </div>
-
         </div>
     </div>
+    <!-- /Page Wrapper -->
+
 </template>
