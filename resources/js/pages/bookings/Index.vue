@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { PlaneTakeoff, Hotel, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-vue-next';
 import GuestLayout from '@/layouts/GuestLayout.vue';
 
 defineOptions({ layout: GuestLayout });
@@ -36,10 +35,10 @@ function formatPrice(price: number, currency: string) {
     }).format(price);
 }
 
-const statusStyle: Record<string, string> = {
-    confirmed:  'bg-emerald-50 text-emerald-700 border-emerald-100',
-    pending:    'bg-amber-50 text-amber-700 border-amber-100',
-    cancelled:  'bg-red-50 text-red-600 border-red-100',
+const statusBadge: Record<string, string> = {
+    confirmed: 'badge-info',
+    pending:   'badge-warning text-dark',
+    cancelled: 'badge-danger',
 };
 
 const cabinLabel: Record<string, string> = {
@@ -51,82 +50,124 @@ const cabinLabel: Record<string, string> = {
 <template>
     <Head title="My Bookings — Obiala" />
 
-    <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-
-        <!-- Header -->
-        <div class="mb-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">
-                    My Bookings
-                </h1>
-                <p class="mt-0.5 text-sm text-gray-500">{{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }} total</p>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar breadcrumb-bg-04 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="breadcrumb-title mb-2">My Bookings</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center mb-0">
+                            <li class="breadcrumb-item"><a href="/"><i class="isax isax-home5"></i></a></li>
+                            <li class="breadcrumb-item active">My Bookings</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-            <Link href="/"
-                  class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
-                + New search
-            </Link>
         </div>
-
-        <!-- Empty state -->
-        <div v-if="bookings.length === 0"
-             class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-20 text-center">
-            <div class="mb-4 text-5xl">✈️</div>
-            <p class="text-base font-bold text-gray-900">No bookings yet</p>
-            <p class="mt-1 text-sm text-gray-500">Search for flights and book your first trip.</p>
-            <Link href="/"
-                  class="mt-5 rounded-xl px-6 py-2.5 text-sm font-semibold text-white"
-                  style="background:linear-gradient(135deg,#1c64f2,#0ea5e9)">
-                Search flights
-            </Link>
-        </div>
-
-        <!-- Bookings list -->
-        <div v-else class="flex flex-col gap-3">
-            <article v-for="booking in bookings" :key="booking.id"
-                     class="flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-sm">
-
-                <!-- Type icon -->
-                <div :class="['flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl',
-                              booking.type === 'flight' ? 'bg-blue-50' : 'bg-purple-50']">
-                    <PlaneTakeoff v-if="booking.type === 'flight'" class="h-5 w-5 text-blue-600" />
-                    <Hotel v-else class="h-5 w-5 text-purple-600" />
-                </div>
-
-                <!-- Route + meta -->
-                <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-gray-900">
-                            {{ booking.origin ?? '—' }} → {{ booking.destination ?? '—' }}
-                        </span>
-                        <span :class="['rounded-full border px-2.5 py-0.5 text-[11px] font-semibold', statusStyle[booking.status]]">
-                            {{ booking.status }}
-                        </span>
-                    </div>
-                    <div class="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
-                        <span v-if="booking.airline">{{ booking.airline }} · {{ booking.flight_no }}</span>
-                        <span v-if="booking.depart_at">
-                            <Clock class="mr-0.5 inline h-3 w-3" />{{ formatDate(booking.depart_at) }}
-                        </span>
-                        <span v-if="booking.cabin_class">{{ cabinLabel[booking.cabin_class] ?? booking.cabin_class }}</span>
-                        <span>{{ booking.passengers }} pax</span>
-                    </div>
-                </div>
-
-                <!-- Price + reference -->
-                <div class="flex flex-col items-end gap-1">
-                    <span class="text-lg font-extrabold text-gray-900">
-                        {{ formatPrice(booking.total_price, booking.currency) }}
-                    </span>
-                    <span class="font-mono text-xs text-gray-400">{{ booking.reference }}</span>
-                </div>
-
-                <!-- View link -->
-                <Link :href="`/booking/${booking.reference}`"
-                      class="flex-shrink-0 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
-                    View →
-                </Link>
-            </article>
-        </div>
-
     </div>
+    <!-- /Breadcrumb -->
+
+    <!-- Page Wrapper -->
+    <div class="content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+
+                    <!-- Card -->
+                    <div class="card hotel-list">
+                        <div class="card-body p-0">
+
+                            <!-- List header -->
+                            <div class="list-header d-flex align-items-center justify-content-between flex-wrap p-3">
+                                <h6 class="mb-0">
+                                    {{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }}
+                                </h6>
+                                <Link href="/"
+                                      class="btn btn-primary btn-sm d-inline-flex align-items-center gap-2">
+                                    <i class="isax isax-add-circle fs-14"></i>
+                                    New search
+                                </Link>
+                            </div>
+
+                            <!-- Empty state -->
+                            <div v-if="bookings.length === 0" class="text-center py-5">
+                                <div class="fs-1 mb-3">✈️</div>
+                                <h5 class="mb-2">No bookings yet</h5>
+                                <p class="text-muted fs-14">Search for flights and book your first trip.</p>
+                                <Link href="/" class="btn btn-primary mt-2">Search flights</Link>
+                            </div>
+
+                            <!-- Table -->
+                            <div v-else class="table-responsive">
+                                <table class="table mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Reference</th>
+                                            <th>Type</th>
+                                            <th>Route</th>
+                                            <th>Class / Pax</th>
+                                            <th>Date</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="booking in bookings" :key="booking.id">
+                                            <td>
+                                                <Link :href="`/booking/${booking.reference}`"
+                                                      class="link-primary fw-medium font-monospace">
+                                                    #{{ booking.reference }}
+                                                </Link>
+                                            </td>
+                                            <td>
+                                                <span class="d-flex align-items-center gap-1">
+                                                    <i :class="['isax fs-16 text-primary',
+                                                               booking.type === 'flight' ? 'isax-airplane' : 'isax-building']"></i>
+                                                    <span class="fs-14 text-capitalize">{{ booking.type }}</span>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <p class="fw-medium mb-0 fs-14">
+                                                    {{ booking.origin ?? '—' }} → {{ booking.destination ?? '—' }}
+                                                </p>
+                                                <span v-if="booking.airline" class="fs-13 text-gray-6">
+                                                    {{ booking.airline }} · {{ booking.flight_no }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <p class="fs-14 mb-0">{{ cabinLabel[booking.cabin_class ?? ''] ?? booking.cabin_class ?? '—' }}</p>
+                                                <span class="fs-13 text-gray-6">{{ booking.passengers }} pax</span>
+                                            </td>
+                                            <td class="fs-14">{{ formatDate(booking.depart_at) }}</td>
+                                            <td class="fs-14 fw-semibold">
+                                                {{ formatPrice(booking.total_price, booking.currency) }}
+                                            </td>
+                                            <td>
+                                                <span :class="['badge rounded-pill d-inline-flex align-items-center fs-10', statusBadge[booking.status] ?? 'badge-secondary']">
+                                                    <i class="fa-solid fa-circle fs-5 me-1"></i>
+                                                    {{ booking.status.charAt(0).toUpperCase() + booking.status.slice(1) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <Link :href="`/booking/${booking.reference}`"
+                                                      class="d-inline-flex align-items-center">
+                                                    <i class="isax isax-eye fs-18"></i>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Page Wrapper -->
+
 </template>
